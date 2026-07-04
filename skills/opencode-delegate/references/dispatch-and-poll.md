@@ -35,7 +35,7 @@ Options:
 | `--agent <name>` | OpenCode agent (default: `build`, write-capable). |
 | `--read-only` | Shortcut for `--agent plan` — review/diagnosis with no edits. |
 | `--variant <name>` | Provider reasoning effort (e.g. `high`, `max`, `minimal`). |
-| `--no-auto` | The relay passes `opencode`'s `--auto` (auto-approve permissions) **by default** so a headless run doesn't hang on a prompt; `--no-auto` drops it and honors the agent's own permission config instead. |
+| `--no-auto` | The relay passes `opencode`'s `--auto` (auto-approve permissions) **by default** so a headless run doesn't hang on a prompt; `--no-auto` drops it and honors the agent's own permission config instead. A `--read-only`/`plan` run never gets `--auto`, so it can't be auto-approved into edits. |
 | `--resume-last` | Continue the most recent OpenCode session; send only the delta brief (see review-and-land). |
 | `--session <id>` | Continue a specific session id (`ses_…`); send only the delta brief. |
 | `--pure` | Run OpenCode without external plugins (cleaner event stream). |

@@ -146,6 +146,8 @@ prompt no one can answer. That is the point of unattended delegation — the orc
 and the implementer sweep (step 4) are the safety net, not a per-action prompt. Pass `--no-auto` to
 honor the agent's own permission config instead (allow/ask/deny per action); pair it with an agent whose
 in-workspace permissions are set to *allow*, or a headless run can hang waiting on an `ask`.
+**Read-only (`plan`) runs never get `--auto`** — auto-approving would let the plan agent's ask-gated
+edit/bash permissions through and defeat "read-only," so a review can't be tricked into touching the tree.
 
 ## Authorization model
 
