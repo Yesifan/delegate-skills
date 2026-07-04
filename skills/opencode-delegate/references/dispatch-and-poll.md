@@ -31,7 +31,7 @@ Options:
 | --- | --- |
 | `--brief <file>` | The brief. Omit it to read the brief from stdin (`node relay.mjs … < brief.txt`). |
 | `--cd <dir>` | Working root for OpenCode (default: current directory). |
-| `--model <name>` | Model as `provider/model` (default: OpenCode's configured default). |
+| `--model <name>` | Model as `provider/model`. **Required on a fresh run** — OpenCode has no safe default (a bare `opencode run` errors); a resumed run inherits its session's model. |
 | `--agent <name>` | OpenCode agent (default: `build`, write-capable). |
 | `--read-only` | Shortcut for `--agent plan` — review/diagnosis with no edits. |
 | `--variant <name>` | Provider reasoning effort (e.g. `high`, `max`, `minimal`). |
@@ -108,8 +108,8 @@ process has exited and `result.json` is written — not when a status line says 
 Under the hood the helper runs roughly:
 
 ```bash
-opencode run --format json --agent build [-m provider/model] < brief.txt     # fresh run
-opencode run --format json --continue    < delta-brief.txt                   # resume most recent
+opencode run --format json --agent build -m provider/model < brief.txt       # fresh run (model required)
+opencode run --format json --continue    < delta-brief.txt                   # resume most recent (inherits model)
 opencode run --format json --session ses_… < delta-brief.txt                 # resume a specific session
 ```
 

@@ -30,7 +30,8 @@
  * Options:
  *   --brief <file>          Path to the brief. If omitted, the brief is read from stdin.
  *   --cd <dir>              Working root for OpenCode (default: current directory).
- *   --model <name>          Model as provider/model (default: OpenCode's configured default).
+ *   --model <name>          Model as provider/model. REQUIRED for a fresh run — OpenCode has no
+ *                           safe default; a resumed run inherits its session's model.
  *   --agent <name>          OpenCode agent (default: build). Use plan for read-only review.
  *   --read-only             Shortcut for --agent plan (review/diagnosis, no edits).
  *   --variant <name>        Provider reasoning effort (e.g. high, max, minimal).
@@ -372,6 +373,11 @@ function main() {
   const opts = parseArgs(process.argv.slice(2));
   const brief = readBrief(opts);
   if (!brief.trim()) fail("empty brief (pass --brief <file> or pipe the brief on stdin)");
+  // OpenCode has no safe default model (a bare `opencode run` errors), so a fresh run must name one.
+  // A resumed run inherits its session's model, so --model is optional there.
+  if (!opts.model && !opts.resumeLast && !opts.session) {
+    fail("no model given: pass --model provider/model — opencode has no safe default (e.g. a plan you're subscribed to, like opencode-go/kimi-k2.7-code)");
+  }
 
   const version = opencodeVersion();
   const run = prepareRunDir(opts, brief);

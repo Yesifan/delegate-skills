@@ -115,11 +115,12 @@ This package is intentionally inspectable:
   before you run it.
 - Neither ever commits — committing is always the orchestrator's job, after review.
 
-**Verification status:** the `codex-delegate` relay's integration (flags, exit codes, `result.json`) is
-verified, and the `opencode-delegate` relay is verified end-to-end against `opencode` v1.17.6 (fresh
-write run, read-only `plan` run, `--resume-last`, session id, cost, and final-message capture). For both,
-the full delegate → review → commit loop is designed for and run on Claude Code but not yet formally
-verified across other orchestrators (Cursor, …), which are designed-for but unproven.
+**Verification status:** each relay's mechanics are verified — argument handling, exit codes,
+`result.json`, resume, and (for `opencode-delegate`) the required-model guard, since OpenCode has no safe
+default. The full delegate → review → commit loop is designed for and run on Claude Code but not yet
+formally verified end-to-end here (OpenCode's cold start is slow in constrained shells, so exercise a
+real run in a normal terminal). Other orchestrators (Cursor, …) are designed-for but unproven. This line
+gets upgraded to "verified end-to-end" with evidence, not assumption.
 
 ## Repository shape
 

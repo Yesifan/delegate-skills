@@ -5,13 +5,8 @@ description: >-
   land it yourself. Use this whenever the user wants to hand implementation work to OpenCode — phrasings
   like "have OpenCode do X", "delegate this to OpenCode", "run it through OpenCode", or "use OpenCode to
   implement/fix/refactor" — or wants to run a queue of coding tasks through OpenCode while staying the
-  reviewer. Prefer it specifically when the user will review the resulting diff and commit it themselves,
-  or wants the full brief → dispatch → review → commit loop across a single task or a queue. Also reach
-  for it proactively for a separate implementation pass on a bounded, well-specified task (an
-  implementation sweep, a migration, a mechanical refactor, parallel work). Covers writing the OpenCode
-  brief, dispatching it via the bundled relay.mjs helper, waiting for completion, reviewing the result,
-  and committing. DO NOT USE for tasks small enough to do inline, or when the user wants the code written
-  directly without delegating.
+  reviewer. Prefer it when the user will review the diff and commit it themselves. DO NOT USE for tasks
+  small enough to do inline, or when the user wants the code written directly without delegating.
 license: MIT
 compatibility: Requires the `opencode` CLI installed and authenticated, Node 18+, and git. The orchestrating agent must be able to run shell commands and read files. Shell examples assume bash/zsh (macOS/Linux, or Git Bash/WSL on Windows).
 metadata:
@@ -45,6 +40,21 @@ orchestrators as designed-for, not yet proven.)
 3. A model provider is authenticated — `opencode auth list` shows at least one credential.
 4. You are in (or will point `--cd` at) the target git repository.
 
+## Choose the implementer model
+
+OpenCode has **no safe default** — a bare `opencode run` errors, so the relay requires `--model` on
+every fresh run (a resumed run inherits its session's model). Picking the model is the point of an
+OpenCode backend, and it is yours to make:
+
+- **Match the model to the task** — a cheap, fast model for a mechanical sweep (rename, migration,
+  removal); a strong one for a subtle bug or a money/security path.
+- **Name a model you pay a flat rate for.** `opencode models` is a large catalog where most entries
+  meter you per token and the CLI can't flag which are your subscriptions — so choose deliberately (e.g.
+  an `opencode-go/*` or `zai-coding-plan/*` plan you hold), not the first match in the list.
+- **State your usable set once** in your own `AGENTS.md`/`CLAUDE.md` so the orchestrator picks from what
+  you actually have instead of guessing. More depth:
+  [references/writing-the-brief.md](references/writing-the-brief.md).
+
 ## The loop
 
 Run these five steps per task. Steps 1, 4, and 5 are your judgment; 2 and 3 are mechanical.
@@ -68,9 +78,10 @@ directory — if unsure where it landed, run `find ~ -name relay.mjs -path '*ope
 substitute the directory above it.)
 
 ```bash
-node "<skill-dir>/scripts/relay.mjs" --brief brief.txt --cd /path/to/repo
+node "<skill-dir>/scripts/relay.mjs" --brief brief.txt --model <provider/model> --cd /path/to/repo
+# --model is required on a fresh run (see "Choose the implementer model" above)
 # read-only (review/diagnosis, no edits):   add --read-only   (uses the plan agent)
-# continue the previous OpenCode session:   add --resume-last  (send only the delta brief)
+# continue the previous OpenCode session:   add --resume-last  (delta brief only; keeps the model)
 # see all options:                          node .../relay.mjs --help
 ```
 
@@ -117,13 +128,6 @@ the party that verified the work. Only after the gates pass and the diff holds:
 - If it needs changes, send a delta brief with `--resume-last` (don't restate the whole task) and
   review again.
 
-## Non-negotiables
-
-- **Re-run the gates yourself.** The self-report is a claim, not evidence.
-- **The orchestrator commits, never the implementer.** Don't assume OpenCode committed; it didn't.
-- **One task = one brief = one commit.** Split unrelated work into separate runs.
-- **Trust the working tree and process state** over any progress tracker.
-
 ## Autonomy model
 
 OpenCode's autonomy is governed by the **agent**, not a sandbox enum:
@@ -145,13 +149,6 @@ and non-blocking nitpicks rather than silently keeping them) and **stop for scop
 completion needs going beyond the brief, ask — don't expand the mandate yourself). The full treatment
 is in [references/review-and-land.md](references/review-and-land.md).
 
-## Trust and safety
-
-`scripts/relay.mjs` itself makes no network calls, reads or writes no credentials, and sends no
-telemetry; it has no dependencies (Node built-ins only) and shells out only to `opencode` and `git`. The
-`opencode` process it launches does authenticate — exactly as you do at the terminal. Read the script
-before you run it. It is the one executable in this package; everything else is Markdown.
-
 ## References
 
 - [references/writing-the-brief.md](references/writing-the-brief.md) — how to write a brief OpenCode can
@@ -162,11 +159,3 @@ before you run it. It is the one executable in this package; everything else is 
   boundary, and the rework cycle via `--resume-last`.
 - [references/multi-task-queues.md](references/multi-task-queues.md) — running a sequential queue:
   carrying constraints forward, progress tracking, and the end-of-run coherence check.
-
-## What this skill does NOT do
-
-- It does not commit for you — that is deliberate (step 5).
-- It does not review the code's quality itself — pair it with guard skills.
-- It does not run your tests — you re-run the project's own gates in step 4.
-- It is not the inverse direction (OpenCode reviewing your work). For that, dispatch a `--read-only`
-  review brief, or use OpenCode's own review workflows directly.

@@ -2,14 +2,28 @@
 
 OpenCode did the typing; you own the judgment. This is where delegation earns its keep or quietly ships
 a mistake. The discipline is simple to state and easy to skip under time pressure: **verify against
-reality, never against the self-report, then commit it yourself.**
+reality, never against the self-report — and read the diff as generated code, which fails in ways a
+green gate can't see.**
+
+## Check the tests before trusting the gates
+
+If the diff touches existing tests, review those edits *first* — before the gate re-run means anything.
+A weakened assertion, an added skip, or a deleted test makes the gate measure less than it did before
+the run; green is only meaningful if the yardstick wasn't shortened.
+
+- **Unbriefed edits to existing tests are a contract change, not part of the fix.** The brief asked for
+  an implementation; nothing in it authorized moving the goalposts. Flag them, don't absorb them.
+- **Skipped, disabled, or commented-out tests added in this diff:** treat the underlying test as failing
+  until proven otherwise, whatever the annotation's comment claims.
+- **Loosened assertions** (exact match relaxed to contains/truthy, error-type checks broadened, tolerance
+  widened): same treatment.
 
 ## Re-run the gates yourself
 
 `result.json` carries OpenCode's own claim that the gates passed. Treat that as a claim, not evidence —
-re-run the project's actual test/lint/build commands in the working tree and read the output. A run
-that "passed" in OpenCode's report but fails when you run it is exactly the failure this step exists to
-catch, and it happens often enough to be worth the minute every time.
+re-run the project's actual test/lint/build commands in the working tree and read the output. And keep
+the result in proportion: **passing is necessary, not sufficient.** An implementer can *game* a gate,
+not just misreport it — that is what the test check above and the sweep below exist to catch.
 
 For changes with their own verification shape, go further:
 
@@ -30,19 +44,45 @@ for:
 - **Quiet judgment calls** — sometimes OpenCode makes a defensible decision the brief didn't anticipate.
   Don't just accept it because it looks reasonable; understand it and decide.
 
-## Compose with guard skills
+## The implementer sweep
 
-This skill produces the work; it doesn't judge code quality. If you have the `guard-skills` package
-installed, run the relevant guard on OpenCode's diff before you commit — `clean-code-guard` on
-production code, `test-guard` on any tests it wrote, `docs-guard` on documentation. They catch the
-systematic failure modes of generated code that a quick read misses. The two packages are designed to
-pair: delegate-skills delegates and lands; guard-skills reviews.
+Generated code fails in systematic ways that gates are structurally blind to — each of these can sit in
+a diff whose tests are all green. Walk them against every diff before you commit:
+
+- **Hardcoded success or fixture data** on a path the brief says does real work — a canned
+  `{status: "ok"}` or default return passes tests *by design*. If OpenCode couldn't implement something,
+  the diff should fail loudly, not pretend.
+- **Catch-all error handling that returns a default** instead of propagating — the suppressed failure is
+  exactly what the gate would have caught. A broad catch is only acceptable with a recovery path the
+  contract documents.
+- **Unverified imports and API calls** — confirm every new dependency, method, and signature exists in
+  the *installed* version (read the lockfile or the package, don't trust plausibility).
+- **Dead weight** — unused imports, helpers nothing calls, unreachable branches, "Step 1/Step 2"
+  comment scaffolding, comments that restate the line below them.
+- **A second way to do what the file already does** — a new HTTP client, error idiom, or logging style
+  introduced beside the existing one instead of reusing it.
+- **New tests that assert internals** — asserting that an internal helper was called, or mocking the
+  project's own functions to isolate a "unit." Green, brittle, and worthless as regression cover.
+- **Near-duplicate test bodies** differing by one value — fold into one data-driven test or drop the
+  copies; bloat reads as coverage but isn't.
+- **Speculative surface** — optional parameters, config flags, or abstractions with no caller in this
+  diff or the repo. Delegated work gets the concrete behavior the brief asked for, nothing extra.
+- **Guards for impossible cases** — null/type checks for values the code's own contract already
+  excludes. Noise that buries the validation that matters at real trust boundaries.
+
+Anything the sweep catches goes back to OpenCode as a delta brief (below) or gets fixed in the tree
+before commit — and either way is reported to the user (see "Surface, don't absorb").
+
+If the `guard-skills` package is installed, run the relevant guard on the diff for the full treatment —
+`clean-code-guard` on production code, `test-guard` on tests, `docs-guard` on documentation. The sweep
+above is the built-in floor; the guards go deeper.
 
 ## The commit boundary
 
-When the gates pass and the diff holds, **you commit** — the orchestrator, never OpenCode. This is the
-deliberate boundary: committing should be the act of the party that verified the work. Write a clear
-message describing what landed. If your project attributes co-authorship, that's the place for it.
+When the gates pass and the diff holds, **you commit** — the orchestrator, never the implementer. The
+`build` agent *can* write the working tree, but committing should be the act of the party that verified
+the work, not the one that produced it. Write a clear message describing what landed. If your project
+attributes co-authorship, that's the place for it.
 
 ## Reworking: send the delta, not the whole task
 
@@ -56,10 +96,9 @@ drop the now-unused import." | node "<skill-dir>/scripts/relay.mjs" --resume-las
 
 (`<skill-dir>` is this skill's install directory — see [dispatch-and-poll.md](dispatch-and-poll.md).)
 
-`--resume-last` continues the most recent session, so it keeps OpenCode's context from the first run and
-a short delta is enough. (Use `--session <id>` with the `sessionId` from `result.json` if a newer run
-has since become "the last one.") Then review again — rework gets the same gate-rerun and diff-read as
-the original, no shortcuts. Repeat until it's right, then commit.
+`--resume-last` keeps OpenCode's session context from the first run (and its model), so a short delta is
+enough. Then review again — rework gets the same gate-rerun, test check, diff-read, and sweep as the
+original, no shortcuts. Repeat until it's right, then commit.
 
 ## Surface, don't absorb
 

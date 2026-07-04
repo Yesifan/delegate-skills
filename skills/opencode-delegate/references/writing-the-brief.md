@@ -6,6 +6,27 @@ whatever it can read from the working tree (including the repo's own `AGENTS.md`
 automatically). If a constraint isn't in the brief or discoverable in the repo, it doesn't exist for
 OpenCode. The single most common failure is a brief that assumes context OpenCode doesn't have.
 
+## Match the model to the brief
+
+OpenCode has no default model, so every fresh dispatch names one with `--model provider/model`. That is
+not friction — it is the lever an OpenCode backend gives you that a single-model implementer can't: you
+choose which model does *this* job.
+
+- **Read the task's difficulty off the brief you just wrote.** A mechanical, well-bounded brief — a
+  rename sweep, a `moment`→`date-fns` migration, a dead-code removal — is safe to send to a cheap, fast
+  model. A brief whose risk lives in judgment — a concurrency fix, a money or auth path, an ambiguous
+  spec — wants a strong model, because the sweep's failure modes (plausible-but-wrong logic, swallowed
+  errors) are exactly what a weaker model produces more of.
+- **Pick from what you actually pay a flat rate for.** `opencode models` lists a few hundred models, but
+  most bill per token (OpenRouter and the like) and the CLI does not mark which are your subscriptions.
+  Name a plan model you hold — e.g. `opencode-go/…`, `zai-coding-plan/…`, `minimax-coding-plan/…` —
+  rather than the first match, or a routine sweep quietly runs up a metered bill.
+- **Encode your defaults once.** List your go-to delegation models in the target repo's `AGENTS.md` or
+  your `CLAUDE.md` (e.g. "delegate mechanical work to X, hard logic to Y") so the orchestrator picks from
+  your real, paid set instead of guessing — and the choice stays consistent across runs.
+- **A resumed run keeps the first run's model.** `--resume-last` / `--session` don't take `--model`; the
+  session already has one. Send only the delta brief.
+
 ## The shape that works
 
 OpenCode responds well to compact, block-structured prompts with XML tags rather than long prose. State
