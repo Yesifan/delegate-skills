@@ -168,6 +168,11 @@ function timestamp() {
 
 function buildArgv(opts) {
   const argv = ["run", "--format", "json"];
+  // Pin the working root explicitly. spawn() below sets the child's cwd, but
+  // OpenCode can resolve its project root from the inherited PWD env (which spawn
+  // does NOT rewrite), so without --dir a run may operate on the orchestrator's
+  // directory instead of opts.cd — and with --auto on, edit it unattended.
+  argv.push("--dir", opts.cd);
   if (opts.pure) argv.push("--pure");
   // Resume continues an existing session; --session pins a specific id, otherwise
   // --continue picks up the most recent one. A resumed run inherits its original
@@ -228,14 +233,19 @@ function makeEventScanner(onObject) {
       }
     }
     // Retain only an in-progress object (if any) so the buffer can't grow without
-    // bound on a long run; everything already emitted or skipped is dropped.
-    if (depth > 0 && start !== -1) {
-      buf = buf.slice(start);
-      start = 0;
-    } else {
-      buf = "";
-      start = -1;
-    }
+    // bound; everything already emitted or skipped is dropped. Reset the scanner
+    // state too: the next call re-derives depth/string state by scanning the
+    // retained buffer (which always begins at an object's `{`) from scratch.
+    // Without the reset, the carried-over depth double-counts the retained braces,
+    // so an object split across chunks never closes and its event is lost.
+    // ponytail: O(n^2) if a single object spans many chunks (each re-scans the
+    // retained prefix); fine for OpenCode's event sizes — switch to a suffix-only
+    // scan if it ever bites.
+    buf = depth > 0 && start !== -1 ? buf.slice(start) : "";
+    start = -1;
+    depth = 0;
+    inString = false;
+    escaped = false;
   };
 }
 
