@@ -2,8 +2,9 @@
 
 This repo is a [Skills CLI](https://github.com/vercel-labs/skills) package of **delegation skills** —
 skills that let an orchestrating agent drive a separate CLI coding agent as an implementer, then review
-and land the result. Two skills ship today: `codex-delegate` (OpenAI Codex) and `opencode-delegate`
-(OpenCode); siblings like `gemini-delegate` can be added later without renaming the repo.
+and land the result. Four skills ship today: `codex-delegate` (OpenAI Codex), `opencode-delegate`
+(OpenCode), `cx-delegate-opsx` (Codex + OpenSpec), and `oc-delegate-opsx` (OpenCode + OpenSpec);
+siblings like `gemini-delegate` can be added later without renaming the repo.
 
 ## Vocabulary
 
@@ -42,10 +43,11 @@ CLI flag, field, and command in the docs must match the installed implementer CL
   the skill otherwise.
 - **Progressive disclosure:** keep `SKILL.md` lean; push depth into `references/*.md` that load only
   when needed.
-- **Executables:** keep them minimal and inspectable. Today there is one per skill —
-  `skills/codex-delegate/scripts/relay.mjs` and `skills/opencode-delegate/scripts/relay.mjs` — each
-  Node built-ins only, no dependencies, no network calls of its own, no credentials, no telemetry. New
-  scripts must hold the same line, and the README's trust section must stay accurate.
+- **Executables:** keep them minimal and inspectable. The relay skills (`codex-delegate`,
+  `opencode-delegate`) each have a `scripts/relay.mjs` — Node built-ins only, no dependencies,
+  no network calls of its own, no credentials, no telemetry. The opsx skills have no scripts —
+  the orchestrator pipes prompts directly to the implementer CLI. New scripts must hold the same
+  line, and the README's trust section must stay accurate.
 
 ## Before publishing a change
 
