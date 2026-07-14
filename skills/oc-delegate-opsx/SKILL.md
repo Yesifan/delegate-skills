@@ -2,12 +2,12 @@
 name: oc-delegate-opsx
 description: >-
   Delegate OpenSpec task groups or codebase exploration to the OpenCode CLI, then review
-  and land it yourself. Use for implementation when a change is ready — phrasings like
+  and land it yourself. Use for implementation when an OpenSpec change is ready — phrasings like
   "delegate to OpenCode", "have OpenCode implement this". Use for local codebase
   exploration — phrasings like "have OpenCode look at", "ask OpenCode what X does".
   Not for tasks small enough to do inline.
 license: MIT
-compatibility: Requires `opencode` CLI installed and authenticated, Node 18+, git, and an OpenSpec change directory.
+compatibility: Requires `opencode` CLI installed and authenticated, git, and an OpenSpec change directory.
 metadata:
   version: 0.1.0
 ---
@@ -19,7 +19,7 @@ You are the **orchestrator**. This skill delegates a bounded task group from an
 implementation, then you verify the result and land it yourself. You construct a prompt from
 the change's spec, design, and tasks, and pipe it directly to `opencode run`.
 
-A sub-agent is a tool, not the default choice. Use it only when both of the following conditions are met:
+An implementer is a tool, not the default choice. Use it only when both of the following conditions are met:
 
 1. Delegation can save context or tokens.
 2. The task’s intermediate execution steps have no lasting value; only the final result matters.
@@ -34,41 +34,34 @@ Evaluate each task group before delegating:
 | Complex implementation, multi-file, needs independent reasoning   | **Delegate** — protect your context                     |
 | Task where intermediate process has no value, only result matters | **Delegate** — perfect fit                              |
 | Exploratory / research question                                   | **Delegate to plan agent** — don't pollute your context |
-| Code review of sub-agent's work                                   | **Do it yourself** — you are the reviewer               |
+| Code review of implementer's work                                   | **Do it yourself** — you are the reviewer               |
 
 ## Prerequisites
 
 `opencode` CLI is available and authenticated (`opencode --version`, `opencode auth list` shows at
 least one credential), an OpenSpec change exists with specs, design, and tasks artifacts
 (`openspec list --json`), and you are in (or will point `--dir` at) the target git repository. If
-`opencode` is not on PATH, report the error and tell the user to install and run `opencode auth
+`opencode` is not on PATH, report the error and tell the user to install (`npm i -g opencode-ai`) and run `opencode auth
 login` — do not attempt to install it yourself. Full pre-flight and recovery:
 [references/dispatch-and-poll.md](references/dispatch-and-poll.md).
 
 ## Choose the implementer model
 
 OpenCode allows the model to be empty — it uses its configured default — so you only need `--model`
-when human want to override for a specific task.
+when the human wants to override for a specific task.
 
 Per-task matching and the resume-model rule: [references/writing-the-brief.md](references/writing-the-brief.md).
 
 ## Choose the agent
 
-OpenCode uses agents to govern autonomy:
-
-- **`build`** (write-capable, default for delegation) — edits files in the working tree headlessly.
-  Pass `--auto` so a headless run never blocks on a permission prompt.
-- **`plan`** (read-only, for explore/review) — uses the plan agent. No `--auto`, so it cannot be
-  tricked into editing the tree.
-
-Dispatch mechanics and the explore-mode flag: [references/dispatch-and-poll.md](references/dispatch-and-poll.md).
+Agent selection and the `--auto` rule: [references/dispatch-and-poll.md](references/dispatch-and-poll.md).
 
 ## Implementation delegation vs. exploration
 
 This skill covers two modes:
 
 - **Implementation**: delegate a task group from an OpenSpec change. Follow the loop below
-  (steps 1-6).
+  (steps 1-6). Dispatches with `--agent build` and `--auto`.
 - **Exploration**: delegate a codebase question — no OpenSpec needed, no edits, no commit.
   Use the template in [references/exploring-the-codebase.md](references/exploring-the-codebase.md),
   dispatch with `--agent plan` and no `--auto`. When the run finishes, read the report and
@@ -117,7 +110,7 @@ re-run the gates yourself, then walk the implementer sweep against every changed
 decisions; stop if correct completion requires going beyond the spec — scope changes are the human's
 call. Full checklist: [references/review-and-land.md](references/review-and-land.md).
 
-**Exploration**: verify evidence quality. The sub-agent's report should cite file paths and line
+**Exploration**: verify evidence quality. The implementer's report should cite file paths and line
 numbers — spot-check key citations against the repo. Surface any findings that need the human's
 judgement.
 
@@ -130,11 +123,7 @@ to step 1.
 
 ## OpenSpec lifecycle
 
-This skill slots into OpenSpec's propose → apply → archive flow: after _propose_ the artifacts
-exist but no code, so you delegate task groups; after _partial implementation_ you delegate the rest
-and resume sessions for rework; after _all tasks done_ you sync delta specs to main specs
-(`openspec-sync-specs`) and archive. Each delegation step is an _apply_ step inside that flow; you
-don't run the lifecycle here, you interleave with it. Depth:
+This skill slots into OpenSpec's propose → apply → archive flow. Depth:
 [references/multi-task-queues.md](references/multi-task-queues.md).
 
 ## References

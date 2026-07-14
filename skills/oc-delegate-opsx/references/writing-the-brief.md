@@ -36,8 +36,8 @@ to fit the task.
   whose risk lives in judgement (concurrency, money/auth path, an ambiguous spec) wants a strong one.
 - **If no usable set is stated, ask — don't guess.** Naming the constraint to the human and letting
   them choose beats a metered bill.
-- **A resumed run inherits its session's model.** `--session` doesn't take `--model`; send only the
-  delta prompt.
+- **A resumed run inherits its session's model.** Send only the delta prompt — the session retains
+  its model from the original run.
 
 ## The shape that works
 
@@ -65,7 +65,7 @@ Supplementary instructions (not in specs):
 {your supplementary context — file placement, naming, conventions}
 
 What to leave untouched:
-{files or areas the sub-agent must not modify}
+{files or areas the implementer must not modify}
 </task>
 
 <verification_loop>

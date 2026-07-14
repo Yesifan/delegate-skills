@@ -1,6 +1,6 @@
 # delegate-skills
 
-[![skills.sh](https://skills.sh/b/amElnagdy/delegate-skills)](https://skills.sh/amElnagdy/delegate-skills)
+[![skills.sh](https://skills.sh/b/Yesifan/delegate-skills)](https://skills.sh/Yesifan/delegate-skills)
 
 Skills for **delegating coding work to a separate CLI agent and landing it yourself**. Your agent (the
 orchestrator) writes a self-contained brief, hands it to an implementer CLI, then reviews the diff and
@@ -8,12 +8,12 @@ commits — staying the reviewer the whole way.
 
 Four skills ship today:
 
-| Skill | Implementer | Pattern |
-|-------|-------------|---------|
-| **`codex-delegate`** | OpenAI Codex CLI | Brief → relay.mjs → result.json |
-| **`opencode-delegate`** | OpenCode CLI | Brief → relay.mjs → result.json |
-| **`cx-delegate-opsx`** | OpenAI Codex CLI | OpenSpec spec → direct exec → update artifacts |
-| **`oc-delegate-opsx`** | OpenCode CLI | OpenSpec spec → direct exec → update artifacts |
+| Skill                   | Implementer      | Pattern                                        |
+| ----------------------- | ---------------- | ---------------------------------------------- |
+| **`codex-delegate`**    | OpenAI Codex CLI | Brief → relay.mjs → result.json                |
+| **`opencode-delegate`** | OpenCode CLI     | Brief → relay.mjs → result.json                |
+| **`cx-delegate-opsx`**  | OpenAI Codex CLI | OpenSpec spec → direct exec → update artifacts |
+| **`oc-delegate-opsx`**  | OpenCode CLI     | OpenSpec spec → direct exec → update artifacts |
 
 ## OpenSpec-native pattern
 
@@ -32,22 +32,22 @@ reviews the diff, handles design.md and spec updates after review, and commits.
 Browse first:
 
 ```bash
-npx skills add amElnagdy/delegate-skills --list
+npx skills add Yesifan/delegate-skills --list
 ```
 
 Install the package, or just one skill:
 
 ```bash
-npx skills add amElnagdy/delegate-skills
-npx skills add amElnagdy/delegate-skills --skill codex-delegate
-npx skills add amElnagdy/delegate-skills --skill opencode-delegate
+npx skills add Yesifan/delegate-skills
+npx skills add Yesifan/delegate-skills --skill codex-delegate
+npx skills add Yesifan/delegate-skills --skill opencode-delegate
 ```
 
 Install for a specific agent, or globally:
 
 ```bash
-npx skills add amElnagdy/delegate-skills --skill codex-delegate --agent claude-code
-npx skills add amElnagdy/delegate-skills --global
+npx skills add Yesifan/delegate-skills --skill codex-delegate --agent claude-code
+npx skills add Yesifan/delegate-skills --global
 ```
 
 Works with any orchestrating agent the [Skills CLI](https://github.com/vercel-labs/skills) supports.
@@ -63,7 +63,7 @@ The opsx skills follow a progressive-disclosure loop — no relay, no brief.txt,
 3. **Pipe it directly** to the implementer CLI, capturing the JSON event stream.
 4. **Extract the session ID** from the output and record it in `tasks.md`.
 5. **Review** the diff and re-run the project's gates yourself.
-6. **Land** it — *you* commit.
+6. **Land** it — _you_ commit.
 
 The prompt template, dispatch mechanics, review checklist, and multi-task sequencing are in
 `references/` files loaded only when needed.
@@ -76,7 +76,7 @@ The original `codex-delegate` and `opencode-delegate` use the relay-based loop:
 2. **Dispatch** it with the bundled `relay.mjs`.
 3. **Wait** for completion — the helper writes a structured `result.json`.
 4. **Review** the diff — re-run the project's gates yourself; pair with [guard skills](https://github.com/amElnagdy/guard-skills).
-5. **Land** it — *you* commit, because committing belongs to the reviewer.
+5. **Land** it — _you_ commit, because committing belongs to the reviewer.
 
 ```text
 Use $cx-delegate-opsx to delegate task group 2 from the 'add-auth' change to Codex, then review and commit.
@@ -94,8 +94,8 @@ point in different directions:
 - The plugin's `codex:codex-rescue` agent is a **forwarder**: it hands one task to Codex and returns
   the output. It deliberately does not poll, review, or commit.
 - The plugin's review command and stop-review gate run the **inverse** direction: **Codex reviews your work**.
-- `codex-delegate` is the **orchestration loop in the other direction**: *you* drive Codex to
-  implement across one task or a queue, and *you* review and land each result. That loop — brief →
+- `codex-delegate` is the **orchestration loop in the other direction**: _you_ drive Codex to
+  implement across one task or a queue, and _you_ review and land each result. That loop — brief →
   dispatch → poll → review → commit, with the orchestrator owning the commit — is what the plugin
   leaves to you, and what this skill encodes.
 
@@ -149,7 +149,7 @@ structured report and the run's cost, and you commit it after re-running the gat
 
 ### gemini-delegate
 
-*Planned.* A delegate skill for the Gemini CLI, if and when it gains a comparable non-interactive mode.
+_Planned._ A delegate skill for the Gemini CLI, if and when it gains a comparable non-interactive mode.
 Reserved so the umbrella can grow without a rename.
 
 ## Requirements
@@ -199,7 +199,8 @@ skills/
 │       ├── writing-the-brief.md
 │       ├── dispatch-and-poll.md
 │       ├── review-and-land.md
-│       └── multi-task-queues.md
+│       ├── multi-task-queues.md
+│       └── exploring-the-codebase.md
 ├── opencode-delegate/
 │   ├── SKILL.md
 │   ├── scripts/relay.mjs
@@ -214,7 +215,8 @@ skills/
         ├── writing-the-brief.md
         ├── dispatch-and-poll.md
         ├── review-and-land.md
-        └── multi-task-queues.md
+        ├── multi-task-queues.md
+        └── exploring-the-codebase.md
 ```
 
 The opsx skills use **progressive disclosure**: the `SKILL.md` keeps the loop outline and context

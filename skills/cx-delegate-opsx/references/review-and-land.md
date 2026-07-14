@@ -6,10 +6,10 @@ as generated code, which fails in ways a green gate can't see.**
 
 ## Read the report first
 
-Before the three layers below, read the sub-agent's final report from `/tmp/delegate_final.txt`
+Before the three layers below, read the implementer's final report from `/tmp/delegate_final.txt`
 (the `-o` target of `codex exec` — see [dispatch-and-poll.md](dispatch-and-poll.md) for context).
 The `<structured_output_contract>` block in your prompt asked for a summary in a fixed shape; this
-file holds the sub-agent's answer. Treat it as a starting summary — every claim gets verified
+file holds the implementer's answer. Treat it as a starting summary — every claim gets verified
 against reality in the layers that follow.
 
 ## Layer 1 — Check test integrity
@@ -26,7 +26,7 @@ did before the run; green is only meaningful if the yardstick wasn't shortened.
 
 ## Layer 2 — Re-run the gates yourself
 
-The sub-agent's claim that gates passed is a claim, not evidence. Re-run the project's actual
+The implementer's claim that gates passed is a claim, not evidence. Re-run the project's actual
 test/lint/build commands in the working tree and read the output. **Passing is necessary, not
 sufficient** — an implementer can *game* a gate, not just misreport it. That's what layer 1 and
 layer 3 exist to catch.
@@ -62,7 +62,7 @@ against every changed file before you commit:
 
 ## Surface, don't absorb
 
-Report design decisions the sub-agent made, note non-blocking nitpicks, and stop if correct
+Report design decisions the implementer made, note non-blocking nitpicks, and stop if correct
 completion requires going beyond the spec — scope changes are the human's call. The OpenSpec brief
 defines a boundary; whatever happens between start and result is disposable, but the result still has
 to land inside that boundary.

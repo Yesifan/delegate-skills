@@ -6,11 +6,11 @@ as generated code, which fails in ways a green gate can't see.**
 
 ## Read the report first
 
-Before the three layers below, read the sub-agent's final report from the captured output. The
+Before the three layers below, read the implementer's final report from the captured output. The
 `<structured_output_contract>` in the prompt asked for a summary in a fixed shape (what changed,
 files touched, gate outcomes, deviations). Extract the last `type: "text"` event from the `.jsonl`
 file (the `python3` command in [dispatch-and-poll.md](dispatch-and-poll.md) does this). Read it —
-it tells you what the sub-agent claims. Then verify every claim against reality in the layers
+it tells you what the implementer claims. Then verify every claim against reality in the layers
 that follow.
 
 ## Layer 1 — Check test integrity
@@ -27,7 +27,7 @@ did before the run; green is only meaningful if the yardstick wasn't shortened.
 
 ## Layer 2 — Re-run the gates yourself
 
-The sub-agent's claim that gates passed is a claim, not evidence. Re-run the project's actual
+The implementer's claim that gates passed is a claim, not evidence. Re-run the project's actual
 test/lint/build commands in the working tree and read the output. **Passing is necessary, not
 sufficient** — an implementer can *game* a gate, not just misreport it. That's what layer 1 and
 layer 3 exist to catch.
@@ -63,7 +63,7 @@ against every changed file before you commit:
 
 ## Surface, don't absorb
 
-Report design decisions the sub-agent made, note non-blocking nitpicks, and stop if correct
+Report design decisions the implementer made, note non-blocking nitpicks, and stop if correct
 completion requires going beyond the spec — scope changes are the human's call. The OpenSpec brief
 defines a boundary; whatever happens between start and result is disposable, but the result still has
 to land inside that boundary.
@@ -75,7 +75,8 @@ to land inside that boundary.
 
   ```bash
   opencode run --session {session_id} [--model {provider/model}] -- <<'PROMPT' \
-    > /tmp/delegate_{capability}_{task-id}.jsonl 2>&1
+    > /tmp/delegate_{capability}_{task-id}.jsonl \
+    2>/tmp/delegate_{capability}_{task-id}.log
   [delta prompt — only the changes needed]
   PROMPT
   ```

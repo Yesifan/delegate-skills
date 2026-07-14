@@ -18,7 +18,7 @@ landing each (review + gates + commit) before dispatching the next. Three reason
 
 Implementation surfaces facts the original plan didn't have — a helper name, a fixture location, an
 interface choice. When a later group depends on one of those, **restate it explicitly in that
-group's prompt**. The sub-agent has no memory of prior runs, so a constraint that emerged in group 2
+group's prompt**. The implementer has no memory of prior runs, so a constraint that emerged in group 2
 must be restated in group 5's prompt or it won't hold. This is the queue equivalent of keeping briefs
 self-contained.
 

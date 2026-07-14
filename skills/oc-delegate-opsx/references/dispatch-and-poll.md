@@ -26,7 +26,8 @@ and task id. Use `--dir <repo>` to set the working root (default: current direct
 ```bash
 opencode run --agent build [--model {provider/model}] --dir /path/to/repo \
   --format json --auto -- <<'PROMPT' \
-  > /tmp/delegate_{capability}_{task-id}.jsonl 2>&1
+  > /tmp/delegate_{capability}_{task-id}.jsonl \
+  2>/tmp/delegate_{capability}_{task-id}.log
 [prompt content]
 PROMPT
 ```
@@ -36,7 +37,8 @@ For **explore mode** (read-only, no edits, using the plan agent):
 ```bash
 opencode run --agent plan [--model {provider/model}] --dir /path/to/repo \
   --format json -- <<'PROMPT' \
-  > /tmp/delegate_{capability}_{task-id}.jsonl 2>&1
+  > /tmp/delegate_{capability}_{task-id}.jsonl \
+  2>/tmp/delegate_{capability}_{task-id}.log
 [prompt content]
 PROMPT
 ```
@@ -45,7 +47,7 @@ PROMPT
 preventing it from editing the tree, so auto-approving would defeat "read-only."
 
 The `--format json` stream is newline-delimited JSON events; `/tmp/delegate_{capability}_{task-id}.jsonl`
-captures them. No relay script, no temp artifacts directory — the orchestrator reads this one file.
+captures them; stderr goes to a sibling `.log`. No relay script, no temp artifacts directory — the orchestrator reads these two files.
 
 ## JSONL event format
 
@@ -57,7 +59,7 @@ recording the run:
 | `step_start` | A new step begins | `sessionID` — the run's session identifier |
 | `tool_use` | The agent calls a tool (bash, read/write, etc.) | `part.tool`, `part.state.input`, `part.state.output` |
 | `step_finish` | A step ends | `part.reason` (`tool-calls` / `stop`), `part.tokens`, **`part.cost`** — step-level USD cost |
-| `text` | The agent emits text output | **`part.text`** — the sub-agent's response content |
+| `text` | The agent emits text output | **`part.text`** — the implementer's response content |
 
 Every event carries these common fields: `type`, `timestamp` (unix ms), `sessionID`.
 
@@ -69,7 +71,7 @@ Typical event sequence:
 5. `text` — the agent's final message (the `<structured_output_contract>` report)
 6. `step_finish` — run ends, final cost and token count
 
-The last `type: "text"` event is the sub-agent's report. Total cost is the sum of all
+The last `type: "text"` event is the implementer's report. Total cost is the sum of all
 `step_finish` events' `part.cost`.
 
 ## Capture the session ID
@@ -87,13 +89,13 @@ Record it in `tasks.md` for future resume:
 - [ ] 2.1 Implement JWT middleware  `delegate: opencode {session_id}`
 ```
 
-If the output file is lost, the session ID survives in `tasks.md` (git-tracked). You'll use it both
-to resume a session for rework (see [review-and-land.md](review-and-land.md)).
+If the output file is lost, the session ID survives in `tasks.md` (git-tracked). You'll use it to
+resume the session for rework (see [review-and-land.md](review-and-land.md)).
 
 ### Read the report
 
-The sub-agent's structured-output report is in the captured `.jsonl` file — the last
-`type: "text"` event is the sub-agent's response to the `<structured_output_contract>`
+The implementer's structured-output report is in the captured `.jsonl` file — the last
+`type: "text"` event is the implementer's response to the `<structured_output_contract>`
 block. Extract it:
 
 ```bash
@@ -108,7 +110,7 @@ print(last)
 " < /tmp/delegate_{capability}_{task-id}.jsonl
 ```
 
-The report tells you what the sub-agent claims to have done and why. Total run cost can
+The report tells you what the implementer claims to have done and why. Total run cost can
 also be extracted from the event stream:
 
 ```bash
@@ -128,19 +130,19 @@ print(f'Cost: \${total:.4f}')
 - **CLI unavailable.** `opencode` is not on PATH — `opencode --version` fails. Report the error and
   tell the user to install (`npm i -g opencode-ai`) and run `opencode auth login`. Do not attempt to
   install it yourself.
-- **Run failed (non-zero exit).** Read the stderr captured in the output file:
+- **Run failed (non-zero exit).** Read the stderr captured in the `.log` file:
   ```bash
-  tail -20 /tmp/delegate_{capability}_{task-id}.jsonl
+  tail -20 /tmp/delegate_{capability}_{task-id}.log
   ```
   Common causes: auth lapse, invalid `--model`, or a permission the run couldn't auto-approve. Fix
   the cause and re-dispatch with a delta prompt; do not paper over it by doing the work yourself.
-- **Empty final message.** The sub-agent exited before producing a report. Treat as a failed run;
-  the events log usually shows where it stopped.
+- **Empty final message.** The implementer exited before producing a report. Treat as a failed run;
+  the .jsonl event stream usually shows where it stopped.
 
 ## What you'd give up by re-introducing a helper
 
 A `relay.mjs` here buys you a captured `result.json` and a touched-files summary — but the
-fixed-path `.jsonl` already carries the session ID, cost, event stream, and sub-agent
+fixed-path `.jsonl` already carries the session ID, cost, event stream, and implementer
 report, and `git status` in the working root already shows what changed. The opsx workflow's
 structure comes from OpenSpec, not from the dispatch layer; adding a helper would be ceremony
 the brief doesn't need.

@@ -9,7 +9,7 @@ spec/design/tasks you read to build it: fold them in, don't point at them.
 ## Source the brief from the OpenSpec change
 
 Read the change's artifacts and embed the load-bearing parts **directly** into the prompt so the
-sub-agent doesn't need to switch context:
+implementer doesn't need to switch context:
 
 1. **`tasks.md`** — pick one task group (e.g. "2. Model layer") whose tasks are independent of other
    groups. Record the capability name from `openspec status` or the spec directory name; it's how
@@ -18,7 +18,7 @@ sub-agent doesn't need to switch context:
 3. **`design.md`** — embed the relevant sections (interface choices, sequencing, what was rejected
    and why).
 4. **Supplementary context that is *not* in the specs** — file placement, naming, conventions the
-   sub-agent can't infer from the spec or the repo's `AGENTS.md`.
+   implementer can't infer from the spec or the repo's `AGENTS.md`.
 
 ## The shape that works
 
@@ -46,7 +46,7 @@ Supplementary instructions (not in specs):
 {your supplementary context — file placement, naming, conventions}
 
 What to leave untouched:
-{files or areas the sub-agent must not modify}
+{files or areas the implementer must not modify}
 </task>
 
 <verification_loop>
@@ -81,7 +81,7 @@ End with a report in this exact shape:
 
 `<verification_loop>` is only useful if it names the project's *actual* commands. Discover them from
 the repo's `CLAUDE.md`, `AGENTS.md`, `Makefile`, or `package.json` — do not assume or hardcode — and
-embed them in the block. A brief that says "run the tests" without naming them gets you a sub-agent
+embed them in the block. A brief that says "run the tests" without naming them gets you an implementer
 that guesses, or skips.
 
 ## Pick the model (when overriding)

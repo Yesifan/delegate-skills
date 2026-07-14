@@ -61,10 +61,10 @@ resume a session for rework (see [review-and-land.md](review-and-land.md)).
 
 ### Read the report
 
-The sub-agent's structured output report is at `/tmp/delegate_final.txt` (the `-o` target of
-`codex exec`). This file contains the final summary the sub-agent wrote in response to the
+The implementer's structured output report is at `/tmp/delegate_final.txt` (the `-o` target of
+`codex exec`). This file contains the final summary the implementer wrote in response to the
 `<structured_output_contract>` block in your prompt. Read it before the review — it tells you
-what the sub-agent claims to have done and why. The review checklist at
+what the implementer claims to have done and why. The review checklist at
 [review-and-land.md](review-and-land.md) tells you how to verify each claim against reality.
 
 ## When a run misbehaves
@@ -79,7 +79,7 @@ what the sub-agent claims to have done and why. The review checklist at
   Common causes: auth lapse (`codex login status`), invalid `--model`, or the sandbox blocked a
   needed operation. Fix the cause and re-dispatch with a delta prompt; do not paper over it by
   doing the work yourself.
-- **Empty final message.** The sub-agent exited before producing a report. Treat as a failed run;
+- **Empty final message.** The implementer exited before producing a report. Treat as a failed run;
   the events log usually shows where it stopped.
 
 ## What you'd give up by re-introducing a helper

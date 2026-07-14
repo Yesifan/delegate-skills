@@ -19,7 +19,7 @@ You are the **orchestrator**. This skill delegates a bounded task group from an
 implementation, then you verify the result and land it yourself. You construct a prompt from
 the change's spec, design, and tasks, and pipe it directly to `codex exec`.
 
-A sub-agent is a tool, not the default choice. Use it only when both of the following conditions are met:
+An implementer is a tool, not the default choice. Use it only when both of the following conditions are met:
 
 1. Delegation can save context or tokens.
 2. The task’s intermediate execution steps have no lasting value; only the final result matters.
@@ -34,7 +34,7 @@ Evaluate each task group before delegating:
 | Complex implementation, multi-file, needs independent reasoning   | **Delegate** — protect your context                    |
 | Task where intermediate process has no value, only result matters | **Delegate** — perfect fit                             |
 | Exploratory / research question                                   | **Delegate explore mode** — don't pollute your context |
-| Code review of sub-agent's work                                   | **Do it yourself** — you are the reviewer              |
+| Code review of implementer's work                                   | **Do it yourself** — you are the reviewer              |
 
 ## Prerequisites
 
@@ -100,7 +100,7 @@ re-run the gates yourself, then walk the implementer sweep against every changed
 decisions; stop if correct completion requires going beyond the spec — scope changes are the human's
 call. Full checklist: [references/review-and-land.md](references/review-and-land.md).
 
-**Exploration**: verify evidence quality. The sub-agent's report should cite file paths and line
+**Exploration**: verify evidence quality. The implementer's report should cite file paths and line
 numbers — spot-check key citations against the repo. Surface any findings that need the human's
 judgement.
 

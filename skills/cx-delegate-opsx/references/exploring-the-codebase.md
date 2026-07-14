@@ -1,6 +1,6 @@
 # Exploring the codebase
 
-Delegate codebase exploration to the sub-agent when the orchestrator has a question about the
+Delegate codebase exploration to the implementer when the orchestrator has a question about the
 local repository — architecture understanding, root cause analysis, impact assessment, or any
 investigation whose intermediate process is disposable but whose findings matter.
 
@@ -10,7 +10,7 @@ investigation whose intermediate process is disposable but whose findings matter
 |-----------|----------|
 | Simple grep / single-file read | **Do it yourself** — overhead not worth it |
 | Multi-file investigation across modules | **Delegate** — protect orchestrator context |
-| Need evidence (file paths, line numbers, snippets) | **Delegate** — sub-agent collects systematically |
+| Need evidence (file paths, line numbers, snippets) | **Delegate** — implementer collects systematically |
 | Subjective judgement call | **Do it yourself** — orchestrator owns the call |
 
 ## The explore brief
@@ -43,7 +43,7 @@ End with a report in this exact shape:
 ## Processing the results
 
 The orchestrator reads the report from the captured output and uses the findings — answer the
-user, update design docs, or decide next steps. No commit step; the sub-agent produces a report,
+user, update design docs, or decide next steps. No commit step; the implementer produces a report,
 not a diff.
 
 ## See also
