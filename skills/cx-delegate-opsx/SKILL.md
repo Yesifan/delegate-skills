@@ -1,13 +1,11 @@
 ---
 name: cx-delegate-opsx
+disable-model-invocation: true
 description: >-
   Delegate OpenSpec task groups or codebase exploration to the Codex CLI, then review
-  and land it yourself. Use for implementation when a change is ready — phrasings like
-  "delegate to Codex", "have Codex implement this". Use for local codebase exploration —
-  phrasings like "have Codex look at", "ask Codex what X does". Not for tasks small
-  enough to do inline.
+  and land it yourself.
 license: MIT
-compatibility: Requires `codex` CLI installed and authenticated, Node 18+, git, and an OpenSpec change directory.
+compatibility: Requires `codex` CLI installed and authenticated, git, and an OpenSpec change directory.
 metadata:
   version: 0.1.0
 ---

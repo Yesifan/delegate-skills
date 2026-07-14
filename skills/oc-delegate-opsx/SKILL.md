@@ -1,11 +1,9 @@
 ---
 name: oc-delegate-opsx
+disable-model-invocation: true
 description: >-
   Delegate OpenSpec task groups or codebase exploration to the OpenCode CLI, then review
-  and land it yourself. Use for implementation when an OpenSpec change is ready — phrasings like
-  "delegate to OpenCode", "have OpenCode implement this". Use for local codebase
-  exploration — phrasings like "have OpenCode look at", "ask OpenCode what X does".
-  Not for tasks small enough to do inline.
+  and land it yourself.
 license: MIT
 compatibility: Requires `opencode` CLI installed and authenticated, git, and an OpenSpec change directory.
 metadata:
