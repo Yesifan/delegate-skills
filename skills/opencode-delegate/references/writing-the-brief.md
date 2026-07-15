@@ -52,6 +52,17 @@ correctness. Do NOT run git add or git commit — the orchestrator commits after
 work uncommitted in the working tree.
 </action_safety>
 
+<headless_environment>
+You run headless — no one can answer interactive prompts. For every CLI command:
+  - Use non-interactive flags: --yes, -y, --force, --no-interactive
+  - If a tool lacks one, prefix: `yes | <command>`
+  - Package managers: CI=true pnpm install (or equivalent)
+  - DB tools: drizzle-kit push --force, prisma migrate dev --yes
+Network-bound operations (DB push, API calls) default to localhost. If they
+fail with EPERM/EACCES, a sandbox network boundary is blocking them — report
+it in structured output, do NOT attempt workarounds.
+</headless_environment>
+
 <structured_output_contract>
 End with a report in this exact shape:
   1. What changed and why

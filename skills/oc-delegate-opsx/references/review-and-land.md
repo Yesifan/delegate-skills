@@ -9,7 +9,7 @@ as generated code, which fails in ways a green gate can't see.**
 Before the three layers below, read the implementer's final report from the captured output. The
 `<structured_output_contract>` in the prompt asked for a summary in a fixed shape (what changed,
 files touched, gate outcomes, deviations). Extract the last `type: "text"` event from the `.jsonl`
-file (the `python3` command in [dispatch-and-poll.md](dispatch-and-poll.md) does this). Read it —
+file (the `jq` command in [dispatch-and-poll.md](dispatch-and-poll.md) does this). Read it —
 it tells you what the implementer claims. Then verify every claim against reality in the layers
 that follow.
 

@@ -158,11 +158,34 @@ Reserved so the umbrella can grow without a rename.
   installed and authenticated (`codex login`).
 - For `opencode-delegate` and `oc-delegate-opsx`: the [`opencode` CLI](https://opencode.ai)
   installed and authenticated (`opencode auth login`).
+- For `codex-delegate` and `opencode-delegate`: Node 18+ (for the `relay.mjs` script).
 - For `cx-delegate-opsx` and `oc-delegate-opsx`: the [`openspec` CLI](https://github.com/fission-ai/openspec)
-  installed and an OpenSpec change created (`openspec new change <name>`).
-- Node 18+ and `git`.
+  installed and an OpenSpec change created (`openspec new change <name>`), plus [`jq`](https://jqlang.github.io/jq/)
+  for extracting results from the JSONL event stream.
+- `git` (for `git status`/`git diff` during review).
 - An orchestrating agent that can run shell commands and read files.
 - Shell examples assume bash/zsh (macOS/Linux, or Git Bash/WSL on Windows).
+
+## Orchestrator permissions
+
+Some orchestrator environments restrict child-process access. When delegating,
+the implementer needs:
+
+| Resource | Why |
+|---|---|
+| Working tree | Read source, write code, run project gates |
+| `/tmp/` or system temp dir | Dispatch artifacts (`.jsonl`, `.log`) |
+| `~/.local/share/opencode/` (Linux) / `%LOCALAPPDATA%/opencode/` (Windows) | OpenCode log persistence |
+| `localhost` ports | Dev servers, databases, test infrastructure |
+
+If a dispatch is blocked by filesystem or network errors:
+
+1. **`--pure`** — append to the dispatch command. Skips plugin loading,
+   including the logger that writes the log path above.
+2. **Redirect log path** — set the env var OpenCode uses (`opencode --help`
+   shows it) to a path inside the workspace.
+3. **Escalate permissions** — allow the blocked path or port in your
+   orchestrator's permission model.
 
 ## Trust and validation
 

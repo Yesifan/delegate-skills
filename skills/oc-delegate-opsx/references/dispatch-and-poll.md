@@ -99,31 +99,31 @@ The implementer's structured-output report is in the captured `.jsonl` file — 
 block. Extract it:
 
 ```bash
-python3 -c "
-import sys,json
-last = ''
-for line in sys.stdin:
-    ev = json.loads(line)
-    if ev.get('type') == 'text':
-        last = ev['part']['text']
-print(last)
-" < /tmp/delegate_{capability}_{task-id}.jsonl
+jq -r 'select(.type == "text") | .part.text' /tmp/delegate_{capability}_{task-id}.jsonl | tail -1
 ```
 
 The report tells you what the implementer claims to have done and why. Total run cost can
 also be extracted from the event stream:
 
 ```bash
-python3 -c "
-import sys,json
-total = 0
-for line in sys.stdin:
-    ev = json.loads(line)
-    if ev.get('type') == 'step_finish' and 'cost' in ev.get('part', {}):
-        total += ev['part']['cost']
-print(f'Cost: \${total:.4f}')
-" < /tmp/delegate_{capability}_{task-id}.jsonl
+jq -s '[.[] | select(.type == "step_finish") | .part?.cost // empty] | add | "Cost: \(.)"' /tmp/delegate_{capability}_{task-id}.jsonl
 ```
+
+## Waiting for completion
+
+`opencode run` is blocking — it returns when the implementer finishes (or fails).
+The dispatch command above **is** the wait. After it exits:
+
+- exit code 0 → implementer completed
+- exit code non-zero → read the stderr `.log` file for the cause
+
+Do NOT poll the `.jsonl` file mid-run with `wc -l` or `tail` — the event stream
+may be buffered, so line count is misleading, and repeated checking burns your
+token budget without gaining useful signal. Trust the exit code.
+
+If you need mid-run visibility (e.g. to detect interactive prompt hangs), set a
+reasonable timeout on the shell command itself — an idle timeout catches hangs
+without per-round polling.
 
 ## When a run misbehaves
 
@@ -136,6 +136,9 @@ print(f'Cost: \${total:.4f}')
   ```
   Common causes: auth lapse, invalid `--model`, or a permission the run couldn't auto-approve. Fix
   the cause and re-dispatch with a delta prompt; do not paper over it by doing the work yourself.
+- **Run hangs (no exit after expected duration).** The implementer likely hit an
+  interactive prompt. Cancel the run, add the `<headless_environment>` block to
+  the brief (see [writing-the-brief.md](writing-the-brief.md)), and re-dispatch.
 - **Empty final message.** The implementer exited before producing a report. Treat as a failed run;
   the .jsonl event stream usually shows where it stopped.
 
