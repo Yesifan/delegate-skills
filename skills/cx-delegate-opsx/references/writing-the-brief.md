@@ -22,8 +22,7 @@ implementer doesn't need to switch context:
 
 ## The shape that works
 
-Codex responds well to compact, block-structured prompts with XML tags. Include all four blocks for
-implementation tasks; omit `verification_loop` and `action_safety` for explore/plan-only tasks.
+Codex responds well to compact, block-structured prompts with XML tags. Include all four blocks.
 
 ```xml
 <role>

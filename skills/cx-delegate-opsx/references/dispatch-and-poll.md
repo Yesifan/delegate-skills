@@ -28,18 +28,9 @@ codex exec -s workspace-write --json -o /tmp/delegate_final.txt -C /path/to/repo
 PROMPT
 ```
 
-For **explore mode** (read-only, no edits):
-
-```bash
-codex exec -s read-only --json -o /tmp/delegate_final.txt -C /path/to/repo -- - <<'PROMPT' \
-  2> /tmp/delegate_{capability}_{task-id}.jsonl
-[prompt content]
-PROMPT
-```
-
-`-s workspace-write` is the write-capable sandbox; `-s read-only` for explore/review. The output
-file at `/tmp/delegate_{capability}_{task-id}.jsonl` captures the JSON event stream. The orchestrator
-does not need a relay script.
+`-s workspace-write` is the write-capable sandbox. The output file at
+`/tmp/delegate_{capability}_{task-id}.jsonl` captures the JSON event stream. The orchestrator does not
+need a relay script.
 
 ## Capture the thread ID
 

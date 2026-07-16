@@ -2,7 +2,7 @@
 name: cx-delegate-opsx
 disable-model-invocation: true
 description: >-
-  Delegate OpenSpec task groups or codebase exploration to the Codex CLI, then review
+  Delegate OpenSpec task groups to the Codex CLI for implementation, then review
   and land it yourself.
 license: MIT
 compatibility: Requires `codex` CLI installed and authenticated, git, and an OpenSpec change directory.
@@ -31,7 +31,6 @@ Evaluate each task group before delegating:
 | Simple, judgmental, or few-line change                            | **Do it yourself** — avoid overhead                    |
 | Complex implementation, multi-file, needs independent reasoning   | **Delegate** — protect your context                    |
 | Task where intermediate process has no value, only result matters | **Delegate** — perfect fit                             |
-| Exploratory / research question                                   | **Delegate explore mode** — don't pollute your context |
 | Code review of implementer's work                                   | **Do it yourself** — you are the reviewer              |
 
 ## Prerequisites
@@ -42,18 +41,6 @@ will point `--cd` at) the target git repository. If `codex` is not on PATH, repo
 the user to install (`npm i -g @openai/codex`) and run `codex login` — do not attempt to install it
 yourself. Full pre-flight and recovery:
 [references/dispatch-and-poll.md](references/dispatch-and-poll.md).
-
-## Implementation delegation vs. exploration
-
-This skill covers two modes:
-
-- **Implementation**: delegate a task group from an OpenSpec change. Follow the loop below
-  (steps 1-6).
-- **Exploration**: delegate a codebase question — no OpenSpec needed, no edits, no commit.
-  Use the template in [references/exploring-the-codebase.md](references/exploring-the-codebase.md),
-  dispatch with `-s read-only`. When the run finishes, read the report and use the findings.
-  No gate re-run or implementer sweep — evidence quality is verified by reading the findings
-  against the question.
 
 ## The delegation loop
 
@@ -70,19 +57,16 @@ name. If multiple groups have no dependency, you can run them in parallel (see
 
 ### 2. Construct the prompt
 
-**Implementation**: read the delta spec, design.md, and main spec. Discover the project's **real
+Read the delta spec, design.md, and main spec. Discover the project's **real
 gate commands** from the repo's `CLAUDE.md`, `AGENTS.md`, `Makefile`, or `package.json` — do not
 assume or hardcode — and embed them in the `<verification_loop>` block. Full template:
 [references/writing-the-brief.md](references/writing-the-brief.md).
-
-**Exploration**: write the question and scope directly using the template in
-[references/exploring-the-codebase.md](references/exploring-the-codebase.md).
 
 ### 3. Dispatch
 
 Pipe the prompt to `codex exec`, redirecting stderr to a fixed-path output file keyed by the
 capability and task id. Use `-C / --cd <repo>` to set the working root. The full command shape
-(default write sandbox vs. read-only explore mode) and what the captured `.jsonl` carries:
+and what the captured `.jsonl` carries:
 [references/dispatch-and-poll.md](references/dispatch-and-poll.md).
 
 ### 4. Capture the thread ID
@@ -93,14 +77,10 @@ future resume. The extraction command and the `delegate: codex {thread_id}` back
 
 ### 5. Review — do not trust the self-report
 
-**Implementation**: Three layers, in order: check test integrity (before the gates mean anything),
+Three layers, in order: check test integrity (before the gates mean anything),
 re-run the gates yourself, then walk the implementer sweep against every changed file. Surface design
 decisions; stop if correct completion requires going beyond the spec — scope changes are the human's
 call. Full checklist: [references/review-and-land.md](references/review-and-land.md).
-
-**Exploration**: verify evidence quality. The implementer's report should cite file paths and line
-numbers — spot-check key citations against the repo. Surface any findings that need the human's
-judgement.
 
 ### 6. Land or rework
 
@@ -123,11 +103,10 @@ don't run the lifecycle here, you interleave with it. Depth:
 - [references/writing-the-brief.md](references/writing-the-brief.md) — sourcing the brief from the
   OpenSpec change, the four-block prompt template, the report contract, and picking the model per task.
 - [references/dispatch-and-poll.md](references/dispatch-and-poll.md) — the `codex exec` command
-  shape, explore mode, thread-id capture, and recovery when a run misbehaves.
+  shape, thread-id capture, and recovery when a run misbehaves.
 - [references/review-and-land.md](references/review-and-land.md) — the three review layers, the
   implementer sweep, the commit boundary, and the resume-based rework cycle.
 - [references/multi-task-queues.md](references/multi-task-queues.md) — sequential vs parallel
   groups, carrying constraints forward, the end-of-run coherence check, and interleaving with the
   OpenSpec lifecycle.
-- [references/exploring-the-codebase.md](references/exploring-the-codebase.md) — when to delegate
-  exploration, the explore brief template, and how to process findings.
+

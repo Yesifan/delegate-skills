@@ -32,20 +32,6 @@ opencode run --agent build [--model {provider/model}] --dir /path/to/repo \
 PROMPT
 ```
 
-For **explore mode** (read-only, no edits, using the plan agent):
-
-```bash
-opencode run --agent plan [--model {provider/model}] --dir /path/to/repo \
-  --format json -- <<'PROMPT' \
-  > /tmp/delegate_{capability}_{task-id}.jsonl \
-  2>/tmp/delegate_{capability}_{task-id}.log
-[prompt content]
-PROMPT
-```
-
-`--auto` is **not** passed for plan-agent runs — the plan agent's permission gates are the only thing
-preventing it from editing the tree, so auto-approving would defeat "read-only."
-
 The `--format json` stream is newline-delimited JSON events; `/tmp/delegate_{capability}_{task-id}.jsonl`
 captures them; stderr goes to a sibling `.log`. No relay script, no temp artifacts directory — the orchestrator reads these two files.
 

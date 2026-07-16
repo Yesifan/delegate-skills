@@ -41,8 +41,7 @@ to fit the task.
 
 ## The shape that works
 
-OpenCode responds well to compact, block-structured prompts with XML tags. Include all four blocks
-for implementation tasks; omit `verification_loop` and `action_safety` for explore/plan-only tasks.
+OpenCode responds well to compact, block-structured prompts with XML tags. Include all four blocks.
 
 ```xml
 <role>
