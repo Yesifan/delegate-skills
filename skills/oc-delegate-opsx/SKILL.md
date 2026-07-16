@@ -26,12 +26,12 @@ An implementer is a tool, not the default choice. Use it only when both of the f
 
 Evaluate each task group before delegating:
 
-| Condition                                                         | Tendency                                                |
-| ----------------------------------------------------------------- | ------------------------------------------------------- |
-| Simple, judgmental, or few-line change                            | **Do it yourself** — avoid overhead                     |
-| Complex implementation, multi-file, needs independent reasoning   | **Delegate** — protect your context                     |
-| Task where intermediate process has no value, only result matters | **Delegate** — perfect fit                              |
-| Code review of implementer's work                                   | **Do it yourself** — you are the reviewer               |
+| Condition                                                         | Tendency                                  |
+| ----------------------------------------------------------------- | ----------------------------------------- |
+| Simple, judgmental, or few-line change                            | **Do it yourself** — avoid overhead       |
+| Complex implementation, multi-file, needs independent reasoning   | **Delegate** — protect your context       |
+| Task where intermediate process has no value, only result matters | **Delegate** — perfect fit                |
+| Code review of implementer's work                                 | **Do it yourself** — you are the reviewer |
 
 ## Prerequisites
 
@@ -41,13 +41,6 @@ least one credential), an OpenSpec change exists with specs, design, and tasks a
 `opencode` is not on PATH, report the error and tell the user to install (`npm i -g opencode-ai`) and run `opencode auth
 login` — do not attempt to install it yourself. Full pre-flight and recovery:
 [references/dispatch-and-poll.md](references/dispatch-and-poll.md).
-
-## Choose the implementer model
-
-OpenCode allows the model to be empty — it uses its configured default — so you only need `--model`
-when the human wants to override for a specific task.
-
-Per-task matching and the resume-model rule: [references/writing-the-brief.md](references/writing-the-brief.md).
 
 ## Choose the agent
 
@@ -115,4 +108,3 @@ This skill slots into OpenSpec's propose → apply → archive flow. Depth:
 - [references/multi-task-queues.md](references/multi-task-queues.md) — sequential vs parallel
   groups, carrying constraints forward, the end-of-run coherence check, and interleaving with the
   OpenSpec lifecycle.
-

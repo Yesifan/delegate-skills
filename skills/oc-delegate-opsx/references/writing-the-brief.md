@@ -3,9 +3,7 @@
 A brief is the entire task as the OpenCode implementer will see it. OpenCode runs in a fresh session
 with **no memory of your conversation, no access to your prior notes, and no shared context** — only
 the text you send and whatever it can read from the working tree. If a constraint isn't in the brief
-or discoverable in the repo, it doesn't exist for OpenCode. The single most common failure is a
-brief that assumes context OpenCode doesn't have — and in the opsx pattern that includes the
-OpenSpec spec/design/tasks you read to build it: fold them in, don't point at them.
+or discoverable in the repo, it doesn't exist for OpenCode.
 
 ## Source the brief from the OpenSpec change
 
@@ -18,15 +16,15 @@ Read the change's artifacts and embed the load-bearing parts **directly** into t
    implementer doesn't need to switch context.
 3. **`design.md`** — embed the relevant sections (the design holds judgements the spec can't carry:
    interface choices, sequencing, what was rejected and why).
-4. **Supplementary context that is *not* in the specs** — file placement, naming, conventions the
+4. **Supplementary context that is _not_ in the specs** — file placement, naming, conventions the
    implementer can't infer from the spec or the repo's `AGENTS.md`.
 
 ## Match the model to the brief
 
-OpenCode allows the model to be empty — it uses its configured default — so you only need `--model`
-when you want to override the default for a specific task. When you override, it's a two-owner
-decision: the **human** owns which models are allowed; **you, the orchestrator**, pick one of them
-to fit the task.
+OpenCode allows the model to be empty — it uses its configured default. Do NOT pass `--model`
+unless the human explicitly asks for one. The human alone decides when to override.
+
+If the human does specify a model, follow these guidelines:
 
 - **The allowed set is the human's to state.** `opencode models` lists hundreds of entries; only the
   human knows which are their flat-rate subscriptions. Ideally they state it once in the repo's
@@ -105,13 +103,6 @@ End with a report in this exact shape:
      Do NOT edit design.md or spec files — report here instead)
 </structured_output_contract>
 ```
-
-## Discover the real gates — don't hardcode
-
-`<verification_loop>` is only useful if it names the project's *actual* commands. Discover them from
-the repo's `CLAUDE.md`, `AGENTS.md`, `Makefile`, or `package.json` — do not assume or hardcode — and
-embed them in the block. A brief that says "run the tests" without naming them gets you an implementer
-that guesses, or skips.
 
 ## One task group per brief
 
