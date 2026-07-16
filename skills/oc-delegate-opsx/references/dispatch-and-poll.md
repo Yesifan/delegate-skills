@@ -1,22 +1,12 @@
 # Dispatch and poll
 
-The opsx pattern dispenses with a relay script: you pipe the brief straight to `opencode run` and
-redirect the JSON event stream to a fixed-path file. Your job is "run a command, redirect output,
-read the file." That is deliberately less machinery than the standalone `opencode-delegate` skill —
-OpenSpec already supplies the structure the brief needs, so the helper layer is dead weight.
-
 ## Before the first run: check the binary
 
 ```bash
-command -v opencode      # the binary that will answer
 opencode --version       # session support varies by version
-opencode auth list       # at least one credential
 ```
 
-`opencode` CLI must be available and authenticated. If not, report the error and tell the user to
-install (`npm i -g opencode-ai`) and run `opencode auth login` — do not attempt to install it
-yourself. A model provider must be authenticated too: `opencode auth list` shows at least one
-credential.
+During the execution of `opencode`, report any problems to the human and let the human solve them. Do not attempt to install or repair by yourself.
 
 ## Dispatching
 
@@ -40,16 +30,17 @@ captures them; stderr goes to a sibling `.log`. No relay script, no temp artifac
 Each line is one JSON event with a `type` field. The format is a sequential event stream
 recording the run:
 
-| Event type | When | Useful fields |
-|---|---|---|
-| `step_start` | A new step begins | `sessionID` — the run's session identifier |
-| `tool_use` | The agent calls a tool (bash, read/write, etc.) | `part.tool`, `part.state.input`, `part.state.output` |
-| `step_finish` | A step ends | `part.reason` (`tool-calls` / `stop`), `part.tokens`, **`part.cost`** — step-level USD cost |
-| `text` | The agent emits text output | **`part.text`** — the implementer's response content |
+| Event type    | When                                            | Useful fields                                                                               |
+| ------------- | ----------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| `step_start`  | A new step begins                               | `sessionID` — the run's session identifier                                                  |
+| `tool_use`    | The agent calls a tool (bash, read/write, etc.) | `part.tool`, `part.state.input`, `part.state.output`                                        |
+| `step_finish` | A step ends                                     | `part.reason` (`tool-calls` / `stop`), `part.tokens`, **`part.cost`** — step-level USD cost |
+| `text`        | The agent emits text output                     | **`part.text`** — the implementer's response content                                        |
 
 Every event carries these common fields: `type`, `timestamp` (unix ms), `sessionID`.
 
 Typical event sequence:
+
 1. `step_start` — run confirmed
 2. `tool_use` / `tool_use` / ... — the agent works (reads files, runs bash, writes code)
 3. `step_finish` — work phase done, with cost and token count
@@ -113,9 +104,6 @@ without per-round polling.
 
 ## When a run misbehaves
 
-- **CLI unavailable.** `opencode` is not on PATH — `opencode --version` fails. Report the error and
-  tell the user to install (`npm i -g opencode-ai`) and run `opencode auth login`. Do not attempt to
-  install it yourself.
 - **Run failed (non-zero exit).** Read the stderr captured in the `.log` file:
   ```bash
   tail -20 /tmp/delegate_{capability}_{task-id}.log
@@ -127,11 +115,3 @@ without per-round polling.
   the brief (see [writing-the-brief.md](writing-the-brief.md)), and re-dispatch.
 - **Empty final message.** The implementer exited before producing a report. Treat as a failed run;
   the .jsonl event stream usually shows where it stopped.
-
-## What you'd give up by re-introducing a helper
-
-A `relay.mjs` here buys you a captured `result.json` and a touched-files summary — but the
-fixed-path `.jsonl` already carries the session ID, cost, event stream, and implementer
-report, and `git status` in the working root already shows what changed. The opsx workflow's
-structure comes from OpenSpec, not from the dispatch layer; adding a helper would be ceremony
-the brief doesn't need.

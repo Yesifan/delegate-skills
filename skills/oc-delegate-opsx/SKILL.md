@@ -38,13 +38,8 @@ Evaluate each task group before delegating:
 `opencode` CLI is available and authenticated (`opencode --version`, `opencode auth list` shows at
 least one credential), an OpenSpec change exists with specs, design, and tasks artifacts
 (`openspec list --json`), and you are in (or will point `--dir` at) the target git repository. If
-`opencode` is not on PATH, report the error and tell the user to install (`npm i -g opencode-ai`) and run `opencode auth
-login` — do not attempt to install it yourself. Full pre-flight and recovery:
+`opencode` is not on PATH, report the error and tell the user to install (`npm i -g opencode-ai`) — do not attempt to install it yourself. Full pre-flight and recovery:
 [references/dispatch-and-poll.md](references/dispatch-and-poll.md).
-
-## Choose the agent
-
-Agent selection and the `--auto` rule: [references/dispatch-and-poll.md](references/dispatch-and-poll.md).
 
 ## The delegation loop
 
@@ -54,7 +49,7 @@ First verify the change is implementable:
 `openspec instructions apply --change "{name}" --json`
 Stop if `state` is `blocked` (missing artifacts) or `all_done` (no work remains).
 
-Then read the change's `tasks.md` and pick one task group whose tasks are independent of other groups.
+Then read the change's `tasks.md` and pick one task group.
 Record the capability name from `openspec status` or the spec directory name. If multiple groups have
 no dependency, you can run them in parallel (see [references/multi-task-queues.md](references/multi-task-queues.md)).
 
@@ -68,8 +63,8 @@ assume or hardcode — and embed them in the `<verification_loop>` block. Full t
 ### 3. Dispatch
 
 Pipe the prompt to `opencode run`, redirecting stdout to a fixed-path output file keyed by the
-capability and task id. Use `--dir <repo>` to set the working root. The full command shape and
-the `--auto` rule:
+capability and task id.
+Use `--dir <repo>` to set the working root. The full command:
 [references/dispatch-and-poll.md](references/dispatch-and-poll.md).
 
 ### 4. Capture the session ID
@@ -91,11 +86,6 @@ If the work is correct and gates pass, commit it. If it needs changes, resume th
 delta prompt — don't restate the whole task. The resume command and the rework cycle:
 [references/review-and-land.md](references/review-and-land.md). If more task groups remain, return
 to step 1.
-
-## OpenSpec lifecycle
-
-This skill slots into OpenSpec's propose → apply → archive flow. Depth:
-[references/multi-task-queues.md](references/multi-task-queues.md).
 
 ## References
 

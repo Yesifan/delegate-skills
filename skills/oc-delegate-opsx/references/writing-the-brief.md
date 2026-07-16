@@ -1,41 +1,21 @@
 # Writing the brief
 
 A brief is the entire task as the OpenCode implementer will see it. OpenCode runs in a fresh session
-with **no memory of your conversation, no access to your prior notes, and no shared context** — only
+with **no memory of your conversation, and no shared context** — only
 the text you send and whatever it can read from the working tree. If a constraint isn't in the brief
 or discoverable in the repo, it doesn't exist for OpenCode.
 
 ## Source the brief from the OpenSpec change
 
-Read the change's artifacts and embed the load-bearing parts **directly** into the brief:
+Reference spec files by path (the implementer reads them from the working tree); embed curated content (design sections, supplementary instructions) directly:
 
-1. **`tasks.md`** — pick one task group whose tasks are independent of other groups. Record the
+1. **`tasks.md`** — pick one task group (or subset, at your discretion). Record the
    capability name from `openspec status` or the spec directory name; it's how you key the output
    file and the `tasks.md` back-link.
-2. **The spec for the relevant capability** — embed the spec content directly into the prompt so the
-   implementer doesn't need to switch context.
-3. **`design.md`** — embed the relevant sections (the design holds judgements the spec can't carry:
+2. **`design.md`** — embed the relevant sections (the design holds judgements the spec can't carry:
    interface choices, sequencing, what was rejected and why).
-4. **Supplementary context that is _not_ in the specs** — file placement, naming, conventions the
+3. **Supplementary context that is _not_ in the specs** — file placement, naming, conventions the
    implementer can't infer from the spec or the repo's `AGENTS.md`.
-
-## Match the model to the brief
-
-OpenCode allows the model to be empty — it uses its configured default. Do NOT pass `--model`
-unless the human explicitly asks for one. The human alone decides when to override.
-
-If the human does specify a model, follow these guidelines:
-
-- **The allowed set is the human's to state.** `opencode models` lists hundreds of entries; only the
-  human knows which are their flat-rate subscriptions. Ideally they state it once in the repo's
-  `AGENTS.md` or `CLAUDE.md`.
-- **Read the task's difficulty off the brief you just wrote, and match within that set.** A
-  mechanical, well-bounded brief (a rename sweep, a removal) is safe on a cheap, fast model; a brief
-  whose risk lives in judgement (concurrency, money/auth path, an ambiguous spec) wants a strong one.
-- **If no usable set is stated, ask — don't guess.** Naming the constraint to the human and letting
-  them choose beats a metered bill.
-- **A resumed run inherits its session's model.** Send only the delta prompt — the session retains
-  its model from the original run.
 
 ## The shape that works
 
@@ -51,9 +31,6 @@ change `- [ ] {task-id}` to `- [x] {task-id}`.
 <task>
 Task {id} from OpenSpec change '{name}'. Capability: {capability}.
 Change root: openspec/changes/{name}/
-
-Spec requirements:
-{spec content — embedded directly}
 
 Design context:
 {relevant design sections}
@@ -82,15 +59,16 @@ structured output — do NOT guess, work around silently, or change scope withou
 explicit justification.
 </action_safety>
 
+<references>
+Files in the working tree that are relevant to this task:
+- Spec: openspec/changes/{name}/specs/{capability}/spec.md
+- {other reference files}
+</references>
+
 <headless_environment>
-You run headless — no one can answer interactive prompts. For every CLI command:
-  - Use non-interactive flags: --yes, -y, --force, --no-interactive
-  - If a tool lacks one, prefix: `yes | <command>`
-  - Package managers: CI=true pnpm install (or equivalent)
-  - DB tools: drizzle-kit push --force, prisma migrate dev --yes
-Network-bound operations (DB push, API calls) default to localhost. If they
-fail with EPERM/EACCES, a sandbox network boundary is blocking them — report
-it in structured output, do NOT attempt workarounds.
+You run headless — no one can answer interactive prompts.
+Use non-interactive flags for every CLI command: --yes, -y, --force, --no-interactive
+Don't try to solve any permission issues on your own. Report them immediately.
 </headless_environment>
 
 <structured_output_contract>
@@ -103,12 +81,3 @@ End with a report in this exact shape:
      Do NOT edit design.md or spec files — report here instead)
 </structured_output_contract>
 ```
-
-## One task group per brief
-
-Keep each brief to a single, bounded task group. One brief → one OpenCode run → one commit keeps
-review and rollback clean and lets a later group assume the earlier one landed. If multiple groups
-have no dependency, you can run them in parallel — see [multi-task-queues.md](multi-task-queues.md).
-
-Send this brief (see [dispatch-and-poll.md](dispatch-and-poll.md)); review the result and land it
-yourself (see [review-and-land.md](review-and-land.md)).
