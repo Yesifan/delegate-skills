@@ -2,8 +2,8 @@
 
 This repo is a [Skills CLI](https://github.com/vercel-labs/skills) package of **delegation skills** —
 skills that let an orchestrating agent drive a separate CLI coding agent as an implementer, then review
-and land the result. Four skills ship today: `codex-delegate` (OpenAI Codex), `opencode-delegate`
-(OpenCode), `cx-delegate-opsx` (Codex + OpenSpec), and `oc-delegate-opsx` (OpenCode + OpenSpec);
+and land the result. Three skills ship today: `codex-delegate` (OpenAI Codex), `opencode-delegate`
+(OpenCode), and `opsx-implementer` (OpenCode or Codex + OpenSpec);
 siblings like `gemini-delegate` can be added later without renaming the repo.
 
 ## Vocabulary
