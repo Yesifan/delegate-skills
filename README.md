@@ -6,22 +6,16 @@ Skills for **delegating coding work to a separate CLI agent and landing it yours
 orchestrator) writes a self-contained brief, hands it to an implementer CLI, then reviews the diff and
 commits — staying the reviewer the whole way.
 
-Three skills ship today:
-
-| Skill                   | Implementer      | Pattern                                        |
-| ----------------------- | ---------------- | ---------------------------------------------- |
-| **`codex-delegate`**    | OpenAI Codex CLI | Brief → relay.mjs → result.json                |
-| **`opencode-delegate`** | OpenCode CLI     | Brief → relay.mjs → result.json                |
-| **`opsx-implementer`**  | OpenCode or Codex CLI | OpenSpec spec → direct exec → update artifacts |
+One skill ships today: **`opsx-implementer`** — delegate OpenSpec task groups to OpenCode or Codex.
 
 ## OpenSpec-native pattern
 
-The **-opsx** skills use an [OpenSpec](https://github.com/fission-ai/openspec)-native approach
+This skill uses an [OpenSpec](https://github.com/fission-ai/openspec)-native approach
 that follows **progressive disclosure**: the `SKILL.md` keeps a lean loop outline with context
 pointers, and depth (prompt template, dispatch mechanics, review checklist, multi-task
 sequencing) loads only when needed from `references/` files. No relay script, no brief.txt,
 no `result.json` — the orchestrator reads specs from the change directory, constructs a
-prompt inline, and pipes it directly to the implementer CLI.
+prompt inline, and pipes it directly to the chosen implementer CLI.
 
 The implementer writes results back to the working tree and marks tasks done; the orchestrator
 reviews the diff, handles design.md and spec updates after review, and commits.
@@ -34,18 +28,17 @@ Browse first:
 npx skills add Yesifan/delegate-skills --list
 ```
 
-Install the package, or just one skill:
+Install the package, or just the skill:
 
 ```bash
 npx skills add Yesifan/delegate-skills
-npx skills add Yesifan/delegate-skills --skill codex-delegate
-npx skills add Yesifan/delegate-skills --skill opencode-delegate
+npx skills add Yesifan/delegate-skills --skill opsx-implementer
 ```
 
 Install for a specific agent, or globally:
 
 ```bash
-npx skills add Yesifan/delegate-skills --skill codex-delegate --agent claude-code
+npx skills add Yesifan/delegate-skills --skill opsx-implementer --agent claude-code
 npx skills add Yesifan/delegate-skills --global
 ```
 
@@ -53,9 +46,9 @@ Works with any orchestrating agent the [Skills CLI](https://github.com/vercel-la
 
 ## What it does
 
-### OpenSpec-native loop (opsx skills)
+### The delegation loop
 
-The opsx skills follow a progressive-disclosure loop — no relay, no brief.txt, no result.json:
+The skill follows a progressive-disclosure loop — no relay, no brief.txt, no result.json:
 
 1. **Select a task group** from an OpenSpec change's `tasks.md`.
 2. **Construct a prompt** from the change's specs, design, and your supplementary context.
@@ -67,39 +60,12 @@ The opsx skills follow a progressive-disclosure loop — no relay, no brief.txt,
 The prompt template, dispatch mechanics, review checklist, and multi-task sequencing are in
 `references/` files loaded only when needed.
 
-### Brief-based loop (relay skills)
-
-The original `codex-delegate` and `opencode-delegate` use the relay-based loop:
-
-1. **Write a brief** — a self-contained task spec; the implementer sees only what you send.
-2. **Dispatch** it with the bundled `relay.mjs`.
-3. **Wait** for completion — the helper writes a structured `result.json`.
-4. **Review** the diff — re-run the project's gates yourself; pair with [guard skills](https://github.com/amElnagdy/guard-skills).
-5. **Land** it — _you_ commit, because committing belongs to the reviewer.
-
 ```text
 Use $opsx-implementer to delegate task group 2 from the 'add-auth' change to Codex (or OpenCode), then review and commit.
 Use $opsx-implementer to delegate task group 3 from the 'add-auth' change to OpenCode, then review and commit.
-Use $codex-delegate to have Codex implement the refactor in services/billing/, then review and commit it.
-Use $opencode-delegate to run this queue of migration tasks through OpenCode while I review each one.
 ```
 
-## How this differs from the OpenAI Codex plugin
 
-The official openai-codex Claude Code plugin is excellent and
-**complementary** — this skill builds on the same `codex` CLI, it doesn't replace the plugin. They
-point in different directions:
-
-- The plugin's `codex:codex-rescue` agent is a **forwarder**: it hands one task to Codex and returns
-  the output. It deliberately does not poll, review, or commit.
-- The plugin's review command and stop-review gate run the **inverse** direction: **Codex reviews your work**.
-- `codex-delegate` is the **orchestration loop in the other direction**: _you_ drive Codex to
-  implement across one task or a queue, and _you_ review and land each result. That loop — brief →
-  dispatch → poll → review → commit, with the orchestrator owning the commit — is what the plugin
-  leaves to you, and what this skill encodes.
-
-If you have the plugin installed, its companion CLI is an optional alternative dispatch backend; the
-bundled `relay.mjs` is the default because it needs nothing but the `codex` binary.
 
 ## The skills
 
@@ -114,26 +80,7 @@ reference files. Prompt depth lives in `references/` files loaded on demand.
 **You'll feel it when:** you have an OpenSpec change and want to delegate a task group to either
 OpenCode or Codex — the skill asks once, then you're in the loop.
 
-### codex-delegate
 
-Drive the OpenAI Codex CLI as a background implementer: write the brief, dispatch via `relay.mjs`,
-review the diff, commit it yourself. Ships four references (writing the brief, dispatch/poll, review/
-land, multi-task queues) loaded only when needed, and one small helper script.
-
-**You'll feel it when:** a bounded task — a migration, a mechanical refactor, a removal sweep — gets
-handed to Codex, comes back as a clean diff with a structured report, and you commit it after re-running
-the gates yourself instead of typing it all by hand.
-
-### opencode-delegate
-
-Drive the OpenCode CLI as a background implementer: write the brief, dispatch via `relay.mjs`, review
-the diff, commit it yourself. Same four references and loop as `codex-delegate`. Autonomy is set by the
-**agent** rather than a sandbox enum — `build` (write-capable) by default, `plan` (read-only) for
-review/diagnosis — and the brief is piped to `opencode run` on stdin so multi-line XML briefs need no
-quoting.
-
-**You'll feel it when:** a bounded task gets handed to OpenCode, comes back as a clean diff with a
-structured report and the run's cost, and you commit it after re-running the gates yourself.
 
 ### gemini-delegate
 
@@ -142,15 +89,10 @@ Reserved so the umbrella can grow without a rename.
 
 ## Requirements
 
-- For `codex-delegate`: the [`codex` CLI](https://github.com/openai/codex)
-  installed and authenticated (`codex login`).
-- For `opencode-delegate`: the [`opencode` CLI](https://opencode.ai)
-  installed and authenticated (`opencode auth login`).
-- For `codex-delegate` and `opencode-delegate`: Node 18+ (for the `relay.mjs` script).
-- For `opsx-implementer`: the [`openspec` CLI](https://github.com/fission-ai/openspec)
-  installed and an OpenSpec change created (`openspec new change <name>`), plus [`jq`](https://jqlang.github.io/jq/)
-  for extracting results from the JSONL event stream.
-- `git` (for `git status`/`git diff` during review).
+- The [`openspec` CLI](https://github.com/fission-ai/openspec) installed and an OpenSpec change
+  created (`openspec new change <name>`).
+- The chosen implementer CLI (`opencode` or `codex`) installed and authenticated.
+- `git` for `git status`/`git diff` during review.
 - An orchestrating agent that can run shell commands and read files.
 - Shell examples assume bash/zsh (macOS/Linux, or Git Bash/WSL on Windows).
 
@@ -177,41 +119,22 @@ If a dispatch is blocked by filesystem or network errors:
 
 ## Trust and validation
 
-This package is intentionally inspectable:
+This skill is intentionally inspectable:
 
 - All skill content is Markdown.
-- `codex-delegate` and `opencode-delegate` each have a `scripts/relay.mjs` (Node built-ins only,
-  no network calls, no credentials, no telemetry). Read it before you run it.
-- `opsx-implementer` has **no scripts** — the orchestrator pipes prompts
-  directly to the implementer CLI. There is nothing to inspect beyond the skill text itself.
+- `opsx-implementer` has **no scripts** — the orchestrator pipes prompts directly to the implementer
+  CLI. There is nothing to inspect beyond the skill text itself.
 - No skill ever commits — committing is always the orchestrator's job, after review.
 
-**Verification status:** the original delegate skills' relay mechanics are verified — argument handling,
-exit codes, `result.json`, resume, and (for `opencode-delegate`) the required-model guard. The -opsx
-skills' prompt templates have been smoke-tested but not yet exercised in a full delegation run. The full
-delegate → review → commit loop is designed for and run on Claude Code but not yet formally verified
-end-to-end here. This line gets upgraded to "verified end-to-end" with evidence, not assumption.
+**Verification status:** the prompt templates have been smoke-tested but not yet exercised in a full
+delegation run. The full delegate → review → commit loop is designed for and run on Claude Code but
+not yet formally verified end-to-end here. This line gets upgraded to "verified end-to-end" with
+evidence, not assumption.
 
 ## Repository shape
 
 ```text
 skills/
-├── codex-delegate/
-│   ├── SKILL.md
-│   ├── scripts/relay.mjs
-│   └── references/
-│       ├── writing-the-brief.md
-│       ├── dispatch-and-poll.md
-│       ├── review-and-land.md
-│       └── multi-task-queues.md
-├── opencode-delegate/
-│   ├── SKILL.md
-│   ├── scripts/relay.mjs
-│   └── references/
-│       ├── writing-the-brief.md
-│       ├── dispatch-and-poll.md
-│       ├── review-and-land.md
-│       └── multi-task-queues.md
 └── opsx-implementer/
     ├── SKILL.md
     └── references/
@@ -223,9 +146,8 @@ skills/
         └── codex-operations.md
 ```
 
-The opsx skill uses **progressive disclosure**: the `SKILL.md` keeps the loop outline and context
-pointers, with depth in `references/` files that load only when needed. The original relay skills
-keep the relay + references structure for backward compatibility.
+The skill uses **progressive disclosure**: the `SKILL.md` keeps the loop outline and context
+pointers, with depth in `references/` files that load only when needed.
 
 ## License
 

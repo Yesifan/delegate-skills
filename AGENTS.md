@@ -2,8 +2,7 @@
 
 This repo is a [Skills CLI](https://github.com/vercel-labs/skills) package of **delegation skills** —
 skills that let an orchestrating agent drive a separate CLI coding agent as an implementer, then review
-and land the result. Three skills ship today: `codex-delegate` (OpenAI Codex), `opencode-delegate`
-(OpenCode), and `opsx-implementer` (OpenCode or Codex + OpenSpec);
+and land the result. One skill ships today: `opsx-implementer` (OpenCode or Codex + OpenSpec);
 siblings like `gemini-delegate` can be added later without renaming the repo.
 
 ## Vocabulary
@@ -43,20 +42,17 @@ CLI flag, field, and command in the docs must match the installed implementer CL
   the skill otherwise.
 - **Progressive disclosure:** keep `SKILL.md` lean; push depth into `references/*.md` that load only
   when needed.
-- **Executables:** keep them minimal and inspectable. The relay skills (`codex-delegate`,
-  `opencode-delegate`) each have a `scripts/relay.mjs` — Node built-ins only, no dependencies,
-  no network calls of its own, no credentials, no telemetry. The opsx skills have no scripts —
-  the orchestrator pipes prompts directly to the implementer CLI. New scripts must hold the same
-  line, and the README's trust section must stay accurate.
+- **No scripts:** `opsx-implementer` has no scripts — the orchestrator pipes prompts directly to the
+  implementer CLI. New skills added to this repo must hold the same line, and the README's trust
+  section must stay accurate.
 
 ## Before publishing a change
 
 - Validate the package locally: `npx skills add . --list`.
-- Smoke-test any changed script directly (e.g. `node skills/<skill>/scripts/relay.mjs --help`, and a
-  `--read-only` run against a throwaway repo) before relying on it.
-- If you touch how a `relay.mjs` launches its implementer CLI, smoke-test on Windows too (native
-  PowerShell/cmd, not just Git Bash/WSL): both the `codex` and `opencode` launches need `shell:true` on
-  win32 to resolve the `.cmd` shim.
+- Smoke-test any changed script directly (e.g. a `--read-only` run against a throwaway repo) before
+  relying on it.
+- If you touch how the implementer CLI is launched, smoke-test on Windows too (native PowerShell/cmd):
+  both the `codex` and `opencode` launches need `shell:true` on win32 to resolve the `.cmd` shim.
 - Keep the README's "Verification status" honest — claim only what's been run.
 
 ## Local Claude Code config

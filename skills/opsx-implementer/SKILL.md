@@ -10,28 +10,19 @@ metadata:
   version: 0.1.0
 ---
 
-# OpenSpec Implementer Delegate
+# OpenSpec Implementer
 
 You are the **orchestrator**. This skill delegates a bounded task group from an
 [OpenSpec](https://github.com/fission-ai/openspec) change to a CLI coding agent for
 implementation, then you verify and land it yourself. You construct a prompt from
 the change's spec, design, and tasks, and pipe it directly to the implementer CLI.
 
+## When to delegate vs. do it yourself
+
 An implementer is a tool, not the default choice. Use it only when both conditions are met:
 
 1. Delegation can save context or tokens.
 2. Only the final result matters — intermediate steps have no lasting value.
-
-## When to delegate vs. do it yourself
-
-Evaluate each task group before delegating:
-
-| Condition                                                         | Tendency                                  |
-| ----------------------------------------------------------------- | ----------------------------------------- |
-| Simple, judgmental, or few-line change                            | **Do it yourself** — avoid overhead       |
-| Complex implementation, multi-file, needs independent reasoning   | **Delegate** — protect your context       |
-| Only result matters, intermediate process has no value            | **Delegate** — perfect fit                |
-| Code review of implementer's work                                 | **Do it yourself** — you are the reviewer |
 
 ## 0. Choose the implementer
 
@@ -42,6 +33,9 @@ Ask the user: "Which implementer? (OpenCode or Codex)" Record the choice. It sta
 Run the chosen CLI's `preflightCheck`. If the CLI is unavailable or unauthenticated, report the error to the user and stop — do not attempt to install it. An OpenSpec change must exist with specs, design, and tasks (`openspec list --json`), and you must be in (or point the dispatch command at) the target git repository.
 
 ## The delegation loop
+
+For simple tasks, delegate and execute them all at once.
+For complex tasks, plan the execution upfront, then delegate in multiple rounds following the plan.
 
 ### 1. Select a task group
 
@@ -93,16 +87,25 @@ Setting a longer timeout or using a notification mechanism is optional.
 
 ### 6. Review — do not trust the self-report
 
-- Read the report via the chosen CLI's `readReport`.
-- Check the task summary.
-  Verify nothing was missed or misaligned against the original brief.
-- Review the implementer's changes against the project's code conventions.
-- Mark genuinely completed tasks in `tasks.md`.
+If there are parallel tasks, you should wait for all parallel tasks to complete and then conduct an overall review based on the reports and git diff.
 
 ### 7. Land or rework
 
 If the work is correct, mark it done in OpenSpec.
 If rework is needed, use `resumeSession` to hand it back to the original CLI agent, or do it yourself.
+
+### 8. continue to the next round or finish
+
+If have next roud,
+Stage the previous round's changes with `git add` so the next round can `git diff` cleanly.
+Update the spec status.
+Go back to step 1 for the next round.
+
+If it's finished,
+report the complete task execution status.
+
+If there are problems,
+end the task as well and report the current execution status and the details of the problems.
 
 ## References
 
