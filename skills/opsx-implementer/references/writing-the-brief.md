@@ -24,8 +24,8 @@ Both OpenCode and Codex respond well to compact, block-structured prompts with X
 
 ```xml
 <role>
-You are implementing a task group from an OpenSpec change. Work through each task one at a
-time.
+You are implementing a task group from an OpenSpec change.
+{other role instructions — tone, style, etc.}
 </role>
 
 <task>
@@ -58,11 +58,12 @@ without cause.
 {other safety constraints}
 </action_safety>
 
-<headless_environment>
+<environment>
 You run headless — no one can answer interactive prompts.
 Use non-interactive flags for every CLI command: --yes, -y, --force, --no-interactive
 Don't try to solve permission issues on your own. Report them immediately.
-</headless_environment>
+{other environment constraints}
+</environment>
 
 <structured_output_contract>
 End with a report in this exact shape:
