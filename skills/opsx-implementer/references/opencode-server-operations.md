@@ -2,104 +2,132 @@
 
 Tested against OpenCode server **v1.18.3**.
 
+All paths are relative to `http://{host}:{port}`.
+
 ## preflightCheck
 
-```bash
-curl -s http://{host}:{port}/global/health
-# Expect: {"healthy":true,"version":"1.18.3"}
+```
+GET /global/health
 ```
 
 ## dispatchBrief (sync)
 
-```bash
-# Step 1: Create session
-SESSION=$(curl -s -X POST "http://{host}:{port}/session?directory=/path/to/repo" \
-  -H "Content-Type: application/json" \
-  -d '{"title": "{specname}-{taskname}-opsx-implementer"}')
-SESSION_ID=$(echo "$SESSION" | jq -r '.id')
+Create a session and send the brief synchronously.
 
-# Step 2: Send brief (blocks until complete)
-RESPONSE=$(curl -s -X POST "http://{host}:{port}/session/$SESSION_ID/message" \
-  -H "Content-Type: application/json" \
-  -d '{"parts": [{"type": "text", "text": "'"$(cat brief.md)"'"}]}')
+**Step 1 — Create session**
 
-# Step 3: Extract text response
-echo "$RESPONSE" | jq -r '.parts[] | select(.type == "text") | .text'
 ```
+POST /session?directory=/path/to/repo
+Body: {"title": "{specname}-{taskname}-opsx-implementer"}
+```
+
+Returns: `{ id: "ses_xxx", ... }`
+
+**Step 2 — Send brief**
+
+```
+POST /session/:id/message
+Body: {"parts": [{"type": "text", "text": "..."}]}
+```
+
+Blocks until the implementer finishes.
 
 ## dispatchBrief (async)
 
-```bash
-# Step 1: Create session (same as sync)
-SESSION=$(curl -s -X POST "http://{host}:{port}/session?directory=/path/to/repo" \
-  -H "Content-Type: application/json" \
-  -d '{"title": "{specname}-{taskname}-opsx-implementer"}')
-SESSION_ID=$(echo "$SESSION" | jq -r '.id')
+Create a session and dispatch without waiting.
 
-# Step 2: Fire and forget — returns 204
-curl -s -X POST "http://{host}:{port}/session/$SESSION_ID/prompt_async" \
-  -H "Content-Type: application/json" \
-  -d '{"parts": [{"type": "text", "text": "'"$(cat brief.md)"'"}]}' \
-  -o /dev/null
+**Step 1 — Create session** (same body as sync)
+
+**Step 2 — Dispatch async**
+
 ```
+POST /session/:id/prompt_async
+Body: {"parts": [{"type": "text", "text": "..."}]}
+```
+
+Returns `204 No Content` immediately. Check results later via `readReport`.
 
 ## extractSessionId
 
-```bash
-SESSION_ID=$(echo "$SESSION" | jq -r '.id')
-```
-
-`$SESSION` is the full response from `POST /session`.
+Extract session ID from the `POST /session` response.
 
 ## readReport
 
-Read the final assistant message:
+Read session messages. Use this to get the implementer's final report.
 
-```bash
-curl -s "http://{host}:{port}/session/{session_id}/message" \
-  | jq -r '.[-1].parts[] | select(.type == "text") | .text'
+```
+GET /session/:id/message
+Returns: {
+  info: {
+    id: "msg_xxx"
+    role: "user" | "assistant";
+    agent?: "plan" | "build"
+    finish?: "stop" | "tool-calls";
+    cost?: number;
+    tokens?: { input: number; output: number; reasoning?: number };
+  };
+  parts: {
+    id: string;
+    type: "text" | "reasoning" | "step-start" | "step-finish" | "tool";
+    text?: string;       // present when type == "text" or "reasoning"
+    tool?: string;       // present when type == "tool"
+  }[];
+}[]
 ```
 
-Read all messages with jq filtering:
-
-```bash
-curl -s "http://{host}:{port}/session/{session_id}/message" \
-  | jq -r '.[] | "\(.info.role): \(.parts[] | select(.type == "text") | .text)"'
-```
+Messages are ordered oldest first.
 
 ## resumeSession
 
-```bash
-curl -s -X POST "http://{host}:{port}/session/{session_id}/message" \
-  -H "Content-Type: application/json" \
-  -d '{"parts": [{"type": "text", "text": "continue with changes..."}]}'
+Continue an existing session. Context is preserved.
+
+```
+POST /session/:id/message
+Body: {"parts": [{"type": "text", "text": "..."}]}
 ```
 
 ## abortSession
 
-```bash
-curl -s -X POST "http://{host}:{port}/session/{session_id}/abort"
-# Returns: true
+```
+POST /session/:id/abort
+
+Returns: bool
+```
+
+## listSessionPermissions
+
+If the session gets stuck, you can check whether the permission request is stuck.
+
+```
+GET /api/session/:id/permission
+Returns:{
+  data:{
+    id: "per_xxx" — use for replyPermission
+    sessionID: "ses_xxx"
+    action: "bash" | "edit" | ...
+    resources: ["npm install"]
+    save?: ["npm *"] — suggested rules to remember
+    source?: {
+      type: "tool";
+      messageID: "msg_xxx"
+      callID: tool call ID
+    };
+  }[]
+};
+```
+
+## replyPermission
+
+```
+POST /permission/:id/reply
+Body: {"reply": "once"|"always"|"reject", "message?": "..."}
 ```
 
 ## Agent and model override
 
-```bash
-curl -s -X POST "http://{host}:{port}/session/{session_id}/message" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "agent": "build",
-    "model": {"providerID": "anthropic", "modelID": "claude-3-5-sonnet-20241022"},
-    "parts": [{"type": "text", "text": "..."}]
-  }'
+Override agent and/or model per message. These fields can be added to any `POST /session/:id/message` body.
+
 ```
-
-## Sync vs async
-
-| 场景 | 模式 | 理由 |
-|------|------|------|
-| 单个 task group | 同步 | 响应即完成，最简单 |
-| 并行多个 task groups | 异步 | 非阻塞，同时发起多个 |
-| 简单 smoke test | 同步 | 立即得到结果 |
-
-Orchestrator 自行决定何时检查异步结果。
+POST /session/:id/message
+Body: {"agent": "build", "model": {"providerID": "...", "modelID": "..."}, "parts": [...]}
+```
