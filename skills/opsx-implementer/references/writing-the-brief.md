@@ -46,6 +46,7 @@ What to leave untouched:
 Files in the working tree that are relevant to this task:
 - Spec: openspec/changes/{name}/specs/{capability}/spec.md
 - {other reference files}
+- {External URL link}
 </references>
 
 <action_safety>
@@ -64,6 +65,10 @@ Use non-interactive flags for every CLI command: --yes, -y, --force, --no-intera
 Don't try to solve permission issues on your own. Report them immediately.
 {other environment constraints}
 </environment>
+
+<tools>
+{List the skills and MCPs that need to be referenced here.}
+</tools>
 
 <structured_output_contract>
 End with a report in this exact shape:

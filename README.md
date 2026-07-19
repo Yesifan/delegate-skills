@@ -51,13 +51,13 @@ Works with any orchestrating agent the [Skills CLI](https://github.com/vercel-la
 The skill follows a progressive-disclosure loop — no relay, no brief.txt, no result.json:
 
 1. **Select a task group** from an OpenSpec change's `tasks.md`.
-2. **Construct a prompt** from the change's specs, design, and your supplementary context.
+2. **Construct a brief** from the change's specs, design, and your supplementary context.
 3. **Pipe it directly** to the implementer CLI, capturing the JSON event stream.
 4. **Extract the session ID** from the output and record it in `tasks.md`.
 5. **Review** the diff and re-run the project's gates yourself.
 6. **Land** it — _you_ commit.
 
-The prompt template, dispatch mechanics, review checklist, and multi-task sequencing are in
+The brief template, dispatch mechanics, and per-CLI operations are in
 `references/` files loaded only when needed.
 
 ```text
@@ -81,11 +81,6 @@ reference files. Prompt depth lives in `references/` files loaded on demand.
 OpenCode or Codex — the skill asks once, then you're in the loop.
 
 
-
-### gemini-delegate
-
-_Planned._ A delegate skill for the Gemini CLI, if and when it gains a comparable non-interactive mode.
-Reserved so the umbrella can grow without a rename.
 
 ## Requirements
 
@@ -126,11 +121,6 @@ This skill is intentionally inspectable:
   CLI. There is nothing to inspect beyond the skill text itself.
 - No skill ever commits — committing is always the orchestrator's job, after review.
 
-**Verification status:** the prompt templates have been smoke-tested but not yet exercised in a full
-delegation run. The full delegate → review → commit loop is designed for and run on Claude Code but
-not yet formally verified end-to-end here. This line gets upgraded to "verified end-to-end" with
-evidence, not assumption.
-
 ## Repository shape
 
 ```text
@@ -139,9 +129,6 @@ skills/
     ├── SKILL.md
     └── references/
         ├── writing-the-brief.md
-        ├── dispatch-and-poll.md
-        ├── review-and-land.md
-        ├── multi-task-queues.md
         ├── opencode-operations.md
         └── codex-operations.md
 ```

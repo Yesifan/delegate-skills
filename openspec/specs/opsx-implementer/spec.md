@@ -32,11 +32,11 @@ The skill SHALL separate CLI-specific commands from shared flow logic. Commands 
 
 ### Requirement: Shared references for agent-agnostic content
 
-The skill SHALL retain shared reference files for content that does not vary by implementer: `dispatch-and-poll.md`, `writing-the-brief.md`, `review-and-land.md`, `multi-task-queues.md`.
+The skill SHALL provide shared reference files for content that does not vary by implementer: `writing-the-brief.md`. The dispatch flow, review checklist, and multi-task sequencing SHALL live inline in `SKILL.md` to keep a single source of truth for the delegation loop.
 
-#### Scenario: Dispatch-and-poll retained as shared flow
-- **WHEN** the orchestrator follows the dispatch flow
-- **THEN** `dispatch-and-poll.md` SHALL describe the sequence of steps, referencing CLI-specific operations by their named keys
+#### Scenario: Flow logic in SKILL.md
+- **WHEN** the orchestrator follows the delegation loop
+- **THEN** `SKILL.md` SHALL describe the sequence of steps, referencing CLI-specific operations by their named keys
 
 ### Requirement: No auto-install
 

@@ -5,7 +5,7 @@
 # Node
 node_modules/
 
-# relay.mjs run artifacts, if a user points --out-dir back into the repo
+# delegate dispatch artifacts (JSONL logs, temp files)
 .delegate/
 
 # local agent config symlink (see AGENTS.md)

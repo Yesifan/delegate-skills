@@ -14,7 +14,7 @@ metadata:
 
 You are the **orchestrator**. This skill delegates a bounded task group from an
 [OpenSpec](https://github.com/fission-ai/openspec) change to a CLI coding agent for
-implementation, then you verify and land it yourself. You construct a prompt from
+implementation, then you verify and land it yourself. You construct a brief from
 the change's spec, design, and tasks, and pipe it directly to the implementer CLI.
 
 ## When to delegate vs. do it yourself
@@ -30,7 +30,9 @@ Ask the user: "Which implementer? (OpenCode or Codex)" Record the choice. It sta
 
 ## Prerequisites
 
-Run the chosen CLI's `preflightCheck`. If the CLI is unavailable or unauthenticated, report the error to the user and stop — do not attempt to install it. An OpenSpec change must exist with specs, design, and tasks (`openspec list --json`), and you must be in (or point the dispatch command at) the target git repository.
+Run the chosen CLI's `preflightCheck`. If the CLI is unavailable or unauthenticated, report the error to the user and stop — do not attempt to install it.
+
+An OpenSpec change must exist with specs, design, and tasks
 
 ## The delegation loop
 
@@ -49,13 +51,13 @@ Record the capability name from `openspec status` or the spec directory name.
 For independent groups, default to **parallel**; use serial only where updates overlap.
 Parallel groups must be **non-overlapping** everywhere (files modified, commands run) — if two tasks both depend on `Task A`, implement `Task A` first, then the rest serially.
 
-### 2. Construct the prompt
+### 2. Construct the brief
 
 Source the brief from project facts and the template at [references/writing-the-brief.md](references/writing-the-brief.md).
 
 ### 3. Dispatch
 
-Run the chosen CLI's `dispatchBrief`.
+Run the chosen CLI's `dispatchBrief` or `resumeSession`.
 
 ### 4. Capture the session/thread ID
 
@@ -66,12 +68,11 @@ Use the CLI's `extractSessionId`/`extractThreadId` to record and resume the sess
 Annotate `tasks.md` after the corresponding task.
 The example below means task 1 was mainly done by session1, but sub-task 1.1 was done by session2:
 
-```
+```md
 ## 1. task 1 [opsx-implementer opencode/codex {session1}]
 
 - [x] 1.1 xxx [opsx-implementer opencode/codex {session2}]
 - [x] 1.2 xxx
-- [x] 1.3 xxx
 ```
 
 ### 5. Wait
@@ -111,7 +112,7 @@ end the task as well and report the current execution status and the details of 
 
 - [references/writing-the-brief.md](references/writing-the-brief.md) — sourcing the brief from the
   OpenSpec change, the report contract.
-- [references/opencode-operations.md](references/opencode-operations.md) — OpenCode CLI commands:
-  `preflightCheck`, `dispatchBrief`, `extractSessionId`, `readReport`, `resumeSession`.
-- [references/codex-operations.md](references/codex-operations.md) — Codex CLI commands:
-  `preflightCheck`, `dispatchBrief`, `extractThreadId`, `readReport`, `resumeSession`.
+
+- Query the methods of [`preflightCheck`, `dispatchBrief`, `extractSessionId`, `readReport`, `resumeSession`] in the documents based on the currently used implementer drive.
+  - [references/opencode-operations.md](references/opencode-operations.md)
+  - [references/codex-operations.md](references/codex-operations.md)

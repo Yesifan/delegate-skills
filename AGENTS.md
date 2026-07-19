@@ -19,7 +19,6 @@ jargon. Use these terms; don't invent synonyms.
 | **gates** | the project's test/lint/build commands | "checks", "CI" |
 | **dispatch** | sending the brief to the implementer | "fire off", "kick off" |
 | **land** | commit the verified work yourself | — |
-| **relay** / `relay.mjs` | the dispatch **script** only | never a *category* of skills |
 | `exec`, `sandbox`, `resume`, `session` | Codex's own terms — use verbatim | don't paraphrase them |
 | `run`, `agent` (`build`/`plan`), `session` | OpenCode's own terms — use verbatim | "sandbox" (OpenCode has no sandbox enum; autonomy is the agent) |
 
@@ -27,13 +26,13 @@ Banned on sight: coined umbrella terms in user-facing surfaces (README headings,
 titles); any reference to the author's local machine or config; model/version pins (`GPT-5.x` →
 version-neutral); and claims that can't be verified ("verified" without a run → hedge or cut). Every
 CLI flag, field, and command in the docs must match the installed implementer CLI (`codex` /
-`opencode`) and the skill's `relay.mjs`.
+`opencode`).
 
 ## Conventions
 
 - **One skill per directory** under `skills/<name>/`, each with a `SKILL.md` plus optional
   `references/` and `scripts/`. The verb is the repo (`delegate`); the target agent is the skill name
-  (`codex-delegate`), mirroring `guard-skills` → `clean-code-guard`.
+  (`opsx-implementer`).
 - **`SKILL.md` frontmatter:** `name` (must equal the directory), `description`, and optionally
   `license`, `compatibility`, `metadata.version`, `allowed-tools`. The **`description` is the only
   triggering signal** — keep it to what the skill does and when to use it, phrased to trigger reliably.
@@ -53,7 +52,6 @@ CLI flag, field, and command in the docs must match the installed implementer CL
   relying on it.
 - If you touch how the implementer CLI is launched, smoke-test on Windows too (native PowerShell/cmd):
   both the `codex` and `opencode` launches need `shell:true` on win32 to resolve the `.cmd` shim.
-- Keep the README's "Verification status" honest — claim only what's been run.
 
 ## Local Claude Code config
 
