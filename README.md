@@ -6,7 +6,7 @@ Skills for **delegating coding work to a separate CLI agent and landing it yours
 orchestrator) writes a self-contained brief, hands it to an implementer CLI, then reviews the diff and
 commits — staying the reviewer the whole way.
 
-One skill ships today: **`opsx-implementer`** — delegate OpenSpec task groups to OpenCode or Codex.
+One skill ships today: **`opsx-implementer`** — delegate OpenSpec task groups to OpenCode CLI, OpenCode Server, or Codex CLI.
 
 ## OpenSpec-native pattern
 
@@ -52,8 +52,8 @@ The skill follows a progressive-disclosure loop — no relay, no brief.txt, no r
 
 1. **Select a task group** from an OpenSpec change's `tasks.md`.
 2. **Construct a brief** from the change's specs, design, and your supplementary context.
-3. **Pipe it directly** to the implementer CLI, capturing the JSON event stream.
-4. **Extract the session ID** from the output and record it in `tasks.md`.
+3. **Pipe it directly** to the implementer (CLI heredoc or Server API), capturing session info.
+4. **Extract the session ID** and record it in `tasks.md`.
 5. **Review** the diff and re-run the project's gates yourself.
 6. **Land** it — _you_ commit.
 
@@ -71,14 +71,15 @@ Use $opsx-implementer to delegate task group 3 from the 'add-auth' change to Ope
 
 ### opsx-implementer
 
-Drive either the OpenCode or Codex CLI as an OpenSpec-aware implementer, chosen at invocation.
-No relay script, no brief.txt, no result.json: the orchestrator reads the spec and design from the
-change directory, constructs a prompt inline, pipes it directly to the chosen CLI, and captures
-the output. CLI-specific commands (dispatch, session/thread extraction, resume) live in dedicated
-reference files. Prompt depth lives in `references/` files loaded on demand.
+Drive OpenCode CLI, OpenCode Server, or Codex CLI as an OpenSpec-aware implementer, chosen at
+invocation. No relay script, no brief.txt, no result.json: the orchestrator reads the spec and
+design from the change directory, constructs a prompt inline, pipes it directly to the chosen CLI
+or Server API, and captures the output. Per-implementer commands (dispatch, session/thread
+extraction, resume) live in dedicated reference files. Prompt depth lives in `references/` files
+loaded on demand.
 
-**You'll feel it when:** you have an OpenSpec change and want to delegate a task group to either
-OpenCode or Codex — the skill asks once, then you're in the loop.
+**You'll feel it when:** you have an OpenSpec change and want to delegate a task group to OpenCode
+CLI, OpenCode Server, or Codex — the skill asks once, then you're in the loop.
 
 
 
@@ -86,7 +87,9 @@ OpenCode or Codex — the skill asks once, then you're in the loop.
 
 - The [`openspec` CLI](https://github.com/fission-ai/openspec) installed and an OpenSpec change
   created (`openspec new change <name>`).
-- The chosen implementer CLI (`opencode` or `codex`) installed and authenticated.
+- The chosen implementer:
+  - **OpenCode CLI** or **Codex CLI**: CLI installed and authenticated.
+  - **OpenCode Server**: running `opencode serve` reachable at the configured host:port.
 - `git` for `git status`/`git diff` during review.
 - An orchestrating agent that can run shell commands and read files.
 - Shell examples assume bash/zsh (macOS/Linux, or Git Bash/WSL on Windows).
@@ -96,12 +99,13 @@ OpenCode or Codex — the skill asks once, then you're in the loop.
 Some orchestrator environments restrict child-process access. When delegating,
 the implementer needs:
 
-| Resource | Why |
-|---|---|
-| Working tree | Read source, write code, run project gates |
-| `/tmp/` or system temp dir | Dispatch artifacts (`.jsonl`, `.log`) |
-| `~/.local/share/opencode/` (Linux) / `%LOCALAPPDATA%/opencode/` (Windows) | OpenCode log persistence |
-| `localhost` ports | Dev servers, databases, test infrastructure |
+| Resource | CLI mode | Server mode |
+|---|---|---|
+| Working tree | Read source, write code, run project gates | Same |
+| `/tmp/` or system temp dir | Dispatch artifacts (`.jsonl`, `.log`) | Not needed |
+| `~/.local/share/opencode/` (Linux) / `%LOCALAPPDATA%/opencode/` (Windows) | OpenCode log persistence | Same |
+| Server host:port | — | HTTP access to `opencode serve` |
+| `localhost` ports | Dev servers, databases, test infrastructure | Same |
 
 If a dispatch is blocked by filesystem or network errors:
 
@@ -130,6 +134,7 @@ skills/
     └── references/
         ├── writing-the-brief.md
         ├── opencode-operations.md
+        ├── opencode-server-operations.md
         └── codex-operations.md
 ```
 
