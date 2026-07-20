@@ -5,32 +5,20 @@ A brief is the task as the implementer sees it. The implementer runs in a fresh 
 it can read from the working tree. If a constraint isn't in the brief or discoverable in the
 repo, it doesn't exist for the implementer.
 
-## Source the brief from the OpenSpec change
-
-Reference spec files by path (the implementer reads them from the working tree); embed curated
-content (design sections, supplementary instructions) inline:
-
-1. **`tasks.md`** — pick one task group (or subset, at your discretion). Record the capability
-   name from `openspec status` or the spec directory name; it's how you key the output file and
-   the `tasks.md` back-link.
-2. **`design.md`** — embed the relevant sections (the design holds judgements the spec can't
-   carry: interface choices, sequencing, what was rejected and why).
-3. **Supplementary context not in the specs** — file placement, naming, conventions the
-   implementer can't infer from the spec or the repo's `AGENTS.md`.
-
-## The shape that works
-
-Both OpenCode and Codex respond well to compact, block-structured prompts with XML tags.
+## Template
 
 ```xml
 <role>
-You are implementing a task group from an OpenSpec change.
+You are implementer.
 {other role instructions — tone, style, etc.}
 </role>
 
+<overview>
+{Overall introduction of the task, background and other information}
+</overview>
+
 <task>
-Task {id} from OpenSpec change '{name}'. Capability: {capability}.
-Change root: openspec/changes/{name}/
+Task '{name}'. Capability: {capability}.
 
 Design context:
 {relevant design sections}
@@ -44,13 +32,12 @@ What to leave untouched:
 
 <references>
 Files in the working tree that are relevant to this task:
-- Spec: openspec/changes/{name}/specs/{capability}/spec.md
+- {spec / task / design files}
 - {other reference files}
 - {External URL link}
 </references>
 
 <action_safety>
-Never modify spec, design, or tasks files under the openspec change directory.
 Do not run `git add` or `git commit`.
 Scope all commands (lint, etc.) to the task — never touch files outside it.
 If an out-of-scope module is missing, stop and report it in structured output.
@@ -60,8 +47,7 @@ without cause.
 </action_safety>
 
 <environment>
-You run headless — no one can answer interactive prompts.
-Use non-interactive flags for every CLI command: --yes, -y, --force, --no-interactive
+You run headless.
 Don't try to solve permission issues on your own. Report them immediately.
 {other environment constraints}
 </environment>
@@ -77,6 +63,5 @@ End with a report in this exact shape:
   - Anything you deviated on, left open, or want a decision on
     (including implementation decisions, spec adjustments, or design issues.
     Do NOT edit design.md or spec files — report here instead)
-
 </structured_output_contract>
 ```

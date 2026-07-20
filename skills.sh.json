@@ -5,7 +5,7 @@
       "title": "Delegate Skills",
       "description": "Delegate a coding task to a CLI implementer agent, then review the diff and commit it yourself.",
       "skills": [
-        "opsx-implementer"
+        "agent-implementer"
       ]
     }
   ]

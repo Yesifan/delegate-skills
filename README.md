@@ -6,19 +6,15 @@ Skills for **delegating coding work to a separate CLI agent and landing it yours
 orchestrator) writes a self-contained brief, hands it to an implementer CLI, then reviews the diff and
 commits — staying the reviewer the whole way.
 
-One skill ships today: **`opsx-implementer`** — delegate OpenSpec task groups to OpenCode CLI, OpenCode Server, or Codex CLI.
+One skill ships today: **`agent-implementer`** — delegate a bounded coding task to OpenCode CLI, OpenCode Server, or Codex CLI, then review and land it yourself.
 
-## OpenSpec-native pattern
+## Progressive-disclosure pattern
 
-This skill uses an [OpenSpec](https://github.com/fission-ai/openspec)-native approach
-that follows **progressive disclosure**: the `SKILL.md` keeps a lean loop outline with context
-pointers, and depth (prompt template, dispatch mechanics, review checklist, multi-task
+This skill follows **progressive disclosure**: the `SKILL.md` keeps a lean loop outline with
+context pointers, and depth (prompt template, dispatch mechanics, review checklist, multi-task
 sequencing) loads only when needed from `references/` files. No relay script, no brief.txt,
-no `result.json` — the orchestrator reads specs from the change directory, constructs a
-prompt inline, and pipes it directly to the chosen implementer CLI.
-
-The implementer writes results back to the working tree and marks tasks done; the orchestrator
-reviews the diff, handles design.md and spec updates after review, and commits.
+no `result.json` — the orchestrator constructs a brief inline and pipes it directly to the
+chosen implementer CLI.
 
 ## Install
 
@@ -32,13 +28,13 @@ Install the package, or just the skill:
 
 ```bash
 npx skills add Yesifan/delegate-skills
-npx skills add Yesifan/delegate-skills --skill opsx-implementer
+npx skills add Yesifan/delegate-skills --skill agent-implementer
 ```
 
 Install for a specific agent, or globally:
 
 ```bash
-npx skills add Yesifan/delegate-skills --skill opsx-implementer --agent claude-code
+npx skills add Yesifan/delegate-skills --skill agent-implementer --agent claude-code
 npx skills add Yesifan/delegate-skills --global
 ```
 
@@ -50,10 +46,10 @@ Works with any orchestrating agent the [Skills CLI](https://github.com/vercel-la
 
 The skill follows a progressive-disclosure loop — no relay, no brief.txt, no result.json:
 
-1. **Select a task group** from an OpenSpec change's `tasks.md`.
-2. **Construct a brief** from the change's specs, design, and your supplementary context.
+1. **Select a task group** from what needs implementing.
+2. **Construct a brief** from project facts and your supplementary context.
 3. **Pipe it directly** to the implementer (CLI heredoc or Server API), capturing session info.
-4. **Extract the session ID** and record it in `tasks.md`.
+4. **Extract the session ID** from the dispatch output.
 5. **Review** the diff and re-run the project's gates yourself.
 6. **Land** it — _you_ commit.
 
@@ -61,32 +57,29 @@ The brief template, dispatch mechanics, and per-CLI operations are in
 `references/` files loaded only when needed.
 
 ```text
-Use $opsx-implementer to delegate task group 2 from the 'add-auth' change to Codex (or OpenCode), then review and commit.
-Use $opsx-implementer to delegate task group 3 from the 'add-auth' change to OpenCode, then review and commit.
+Use $agent-implementer to delegate task group 2 to Codex (or OpenCode), then review and commit.
+Use $agent-implementer to delegate task group 3 to OpenCode, then review and commit.
 ```
 
 
 
 ## The skills
 
-### opsx-implementer
+### agent-implementer
 
-Drive OpenCode CLI, OpenCode Server, or Codex CLI as an OpenSpec-aware implementer, chosen at
-invocation. No relay script, no brief.txt, no result.json: the orchestrator reads the spec and
-design from the change directory, constructs a prompt inline, pipes it directly to the chosen CLI
-or Server API, and captures the output. Per-implementer commands (dispatch, session/thread
-extraction, resume) live in dedicated reference files. Prompt depth lives in `references/` files
-loaded on demand.
+Drive OpenCode CLI, OpenCode Server, or Codex CLI as the implementer, chosen at invocation. No
+relay script, no brief.txt, no result.json: the orchestrator constructs a brief inline, pipes it
+directly to the chosen CLI or Server API, and captures the output. Per-implementer commands
+(dispatch, session/thread extraction, resume) live in dedicated reference files. Prompt depth
+lives in `references/` files loaded on demand.
 
-**You'll feel it when:** you have an OpenSpec change and want to delegate a task group to OpenCode
-CLI, OpenCode Server, or Codex — the skill asks once, then you're in the loop.
+**You'll feel it when:** you have a bounded task to delegate to OpenCode CLI, OpenCode Server, or
+Codex — the skill asks once, then you're in the loop.
 
 
 
 ## Requirements
 
-- The [`openspec` CLI](https://github.com/fission-ai/openspec) installed and an OpenSpec change
-  created (`openspec new change <name>`).
 - The chosen implementer:
   - **OpenCode CLI** or **Codex CLI**: CLI installed and authenticated.
   - **OpenCode Server**: running `opencode serve` reachable at the configured host:port.
@@ -121,7 +114,7 @@ If a dispatch is blocked by filesystem or network errors:
 This skill is intentionally inspectable:
 
 - All skill content is Markdown.
-- `opsx-implementer` has **no scripts** — the orchestrator pipes prompts directly to the implementer
+- `agent-implementer` has **no scripts** — the orchestrator pipes prompts directly to the implementer
   CLI. There is nothing to inspect beyond the skill text itself.
 - No skill ever commits — committing is always the orchestrator's job, after review.
 
@@ -129,7 +122,7 @@ This skill is intentionally inspectable:
 
 ```text
 skills/
-└── opsx-implementer/
+└── agent-implementer/
     ├── SKILL.md
     └── references/
         ├── writing-the-brief.md
