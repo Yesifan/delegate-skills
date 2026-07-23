@@ -30,7 +30,7 @@ An implementer is a tool, not the default. Delegate only when both hold:
 Ask: "Which implementer? (OpenCode CLI, OpenCode Server, or Codex CLI)". Record it —
 it stays fixed for the loop.
 
-If OpenCode Server, ask for host and port (default `127.0.0.1:4096`).
+If OpenCode Server — see the connection details in the operations reference.
 
 ## Prerequisites
 

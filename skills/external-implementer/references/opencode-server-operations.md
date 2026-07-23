@@ -4,11 +4,45 @@ Tested against OpenCode server **v1.18.3**.
 
 All paths are relative to `http://{host}:{port}`.
 
+## Authentication
+
+If `OPENCODE_SERVER_PASSWORD` is set, the server requires HTTP Basic Auth.
+Include the following header on every request:
+
+```
+Authorization: Basic <base64>
+```
+
+Where `<base64>` = `base64("{username}:{password}")`, with username
+defaulting to `opencode` (overridable via `OPENCODE_SERVER_USERNAME`).
+The orchestrator should read these from the environment before making
+any API calls.
+
+All endpoints below require this header when auth is enabled.
+
+## Connecting
+
+When the user chooses OpenCode Server, determine the server's address:
+
+1. **From user prompt**
+2. **Auto-discover** from running processes:
+   - Probe `http://127.0.0.1:4096/global/health`.
+   - `ps aux | grep "opencode serve"` and parse `--port <N>`.
+   - mDNS: if the server was started with `--mdns`, try `http://opencode.local:4096`.
+
+3. **Ask user**:
+   - If the server is not running, ask the user to start it with `opencode serve`.
+   - If the server is running but not reachable, ask for host and port.
+
+---
+
 ## preflightCheck
 
 ```
 GET /global/health
 ```
+
+Include `Authorization` header if auth is enabled. Returns `{ healthy: true, version }` on 200.
 
 ## dispatchBrief (sync)
 

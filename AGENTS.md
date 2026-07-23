@@ -52,7 +52,8 @@ CLI flag, field, and command in the docs must match the installed implementer CL
   relying on it.
 - If you touch how the implementer CLI is launched, smoke-test on Windows too (native PowerShell/cmd):
   both the `codex` and `opencode` launches need `shell:true` on win32 to resolve the `.cmd` shim.
-- Smoke-test OpenCode Server operations against a live server (`opencode serve --port 4096`):
+- Smoke-test OpenCode Server operations against a live server (`opencode serve --port 4096`),
+  optionally with `OPENCODE_SERVER_PASSWORD` for auth:
   verify `preflightCheck` returns healthy, `dispatchBrief` sync returns a response, and
   `readReport` extracts text correctly.
 

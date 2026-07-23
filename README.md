@@ -82,7 +82,7 @@ Codex — the skill asks once, then you're in the loop.
 
 - The chosen implementer:
   - **OpenCode CLI** or **Codex CLI**: CLI installed and authenticated.
-  - **OpenCode Server**: running `opencode serve` reachable at the configured host:port.
+  - **OpenCode Server**: running `opencode serve` reachable at the configured host:port. Auth via `OPENCODE_SERVER_PASSWORD` (HTTP Basic Auth).
 - `git` for `git status`/`git diff` during review.
 - An orchestrating agent that can run shell commands and read files.
 - Shell examples assume bash/zsh (macOS/Linux, or Git Bash/WSL on Windows).
