@@ -6,7 +6,7 @@ Skills for **delegating coding work to a separate CLI agent and landing it yours
 orchestrator) writes a self-contained brief, hands it to an implementer CLI, then reviews the diff and
 commits — staying the reviewer the whole way.
 
-One skill ships today: **`agent-implementer`** — delegate a bounded coding task to OpenCode CLI, OpenCode Server, or Codex CLI, then review and land it yourself.
+One skill ships today: **`external-implementer`** — delegate a bounded coding task to OpenCode CLI, OpenCode Server, or Codex CLI, then review and land it yourself.
 
 ## Progressive-disclosure pattern
 
@@ -28,13 +28,13 @@ Install the package, or just the skill:
 
 ```bash
 npx skills add Yesifan/delegate-skills
-npx skills add Yesifan/delegate-skills --skill agent-implementer
+npx skills add Yesifan/delegate-skills --skill external-implementer
 ```
 
 Install for a specific agent, or globally:
 
 ```bash
-npx skills add Yesifan/delegate-skills --skill agent-implementer --agent claude-code
+npx skills add Yesifan/delegate-skills --skill external-implementer --agent claude-code
 npx skills add Yesifan/delegate-skills --global
 ```
 
@@ -57,15 +57,15 @@ The brief template, dispatch mechanics, and per-CLI operations are in
 `references/` files loaded only when needed.
 
 ```text
-Use $agent-implementer to delegate task group 2 to Codex (or OpenCode), then review and commit.
-Use $agent-implementer to delegate task group 3 to OpenCode, then review and commit.
+Use $external-implementer to delegate task group 2 to Codex (or OpenCode), then review and commit.
+Use $external-implementer to delegate task group 3 to OpenCode, then review and commit.
 ```
 
 
 
 ## The skills
 
-### agent-implementer
+### external-implementer
 
 Drive OpenCode CLI, OpenCode Server, or Codex CLI as the implementer, chosen at invocation. No
 relay script, no brief.txt, no result.json: the orchestrator constructs a brief inline, pipes it
@@ -114,7 +114,7 @@ If a dispatch is blocked by filesystem or network errors:
 This skill is intentionally inspectable:
 
 - All skill content is Markdown.
-- `agent-implementer` has **no scripts** — the orchestrator pipes prompts directly to the implementer
+- `external-implementer` has **no scripts** — the orchestrator pipes prompts directly to the implementer
   CLI. There is nothing to inspect beyond the skill text itself.
 - No skill ever commits — committing is always the orchestrator's job, after review.
 
@@ -122,7 +122,7 @@ This skill is intentionally inspectable:
 
 ```text
 skills/
-└── agent-implementer/
+└── external-implementer/
     ├── SKILL.md
     └── references/
         ├── writing-the-brief.md

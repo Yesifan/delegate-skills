@@ -2,7 +2,7 @@
 
 This repo is a [Skills CLI](https://github.com/vercel-labs/skills) package of **delegation skills** —
 skills that let an orchestrating agent drive a separate CLI coding agent as an implementer, then review
-and land the result. One skill ships today: `agent-implementer` (OpenCode or Codex);
+and land the result. One skill ships today: `external-implementer` (OpenCode or Codex);
 siblings like `gemini-delegate` can be added later without renaming the repo.
 
 ## Vocabulary
@@ -32,7 +32,7 @@ CLI flag, field, and command in the docs must match the installed implementer CL
 
 - **One skill per directory** under `skills/<name>/`, each with a `SKILL.md` plus optional
   `references/` and `scripts/`. The verb is the repo (`delegate`); the target agent is the skill name
-  (`agent-implementer`).
+  (`external-implementer`).
 - **`SKILL.md` frontmatter:** `name` (must equal the directory), `description`, and optionally
   `license`, `compatibility`, `metadata.version`, `allowed-tools`. The **`description` is the only
   triggering signal** — keep it to what the skill does and when to use it, phrased to trigger reliably.
@@ -41,7 +41,7 @@ CLI flag, field, and command in the docs must match the installed implementer CL
   the skill otherwise.
 - **Progressive disclosure:** keep `SKILL.md` lean; push depth into `references/*.md` that load only
   when needed.
-- **No scripts:** `agent-implementer` has no scripts — the orchestrator pipes prompts directly to the
+- **No scripts:** `external-implementer` has no scripts — the orchestrator pipes prompts directly to the
   implementer CLI. New skills added to this repo must hold the same line, and the README's trust
   section must stay accurate.
 

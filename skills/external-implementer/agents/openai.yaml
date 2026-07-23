@@ -1,0 +1,8 @@
+interface:
+  display_name: "Agent Implementer"
+  short_description: "Delegate a bounded task to a coding agent."
+  brand_color: "#3B82F6"
+  default_prompt: "Use $external-implementer to delegate a coding task to an implementer agent."
+
+policy:
+  allow_implicit_invocation: false

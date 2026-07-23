@@ -1,5 +1,5 @@
 ---
-name: agent-implementer
+name: external-implementer
 disable-model-invocation: true
 description: >-
   Delegate task to a coding agent (OpenCode or Codex) for
